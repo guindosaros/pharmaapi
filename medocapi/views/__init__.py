@@ -1,0 +1,1 @@
+from .medicaments import MedicamentViewSet

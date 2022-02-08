@@ -33,8 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'django.contrib.sites',
-    
+    "django.contrib.sites",
     # packages
     "rest_framework",
     "import_export",
@@ -145,3 +144,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Media files config
 MEDIA_URL = "/media/"  # or any prefix you choose
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240

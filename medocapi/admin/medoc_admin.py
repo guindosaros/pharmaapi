@@ -1,13 +1,22 @@
 from django.contrib import admin
 from import_export import resources, fields
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin, ImportExportMixinBase
 from medocapi import models
+
+
+class ImportMixin(ImportExportMixinBase):
+    """
+    Import mixin.
+    """
+
+    from_encoding = "utf-8-sig"
 
 
 class MedicamentsResource(resources.ModelResource):
     class Meta:
         model = models.Medicaments
         fields = (
+            "id",
             "code",
             "nom",
             "dci1",
@@ -24,6 +33,7 @@ class MedicamentsResource(resources.ModelResource):
 
 
 class MedicamentsAdmin(ImportExportModelAdmin):
+    from_encoding = "utf-8"
     resource_class = MedicamentsResource
 
 

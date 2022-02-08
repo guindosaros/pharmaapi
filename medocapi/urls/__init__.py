@@ -1,0 +1,1 @@
+from .medicament import urlpatterns

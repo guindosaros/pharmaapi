@@ -44,4 +44,5 @@ urlpatterns = [
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', include_docs_urls(title='Pharma MEDOC API', public=True)),
     path("admin/", admin.site.urls),
+    path(f"{BASE_PATH}/", include('medocapi.urls')),
 ]
