@@ -28,6 +28,7 @@ class Medicaments(models.Model):
 
         verbose_name = "Medicaments"
         verbose_name_plural = "Medicamentss"
+        ordering = ("nom",)
 
     def __str__(self):
         """Unicode representation of Medicaments."""
