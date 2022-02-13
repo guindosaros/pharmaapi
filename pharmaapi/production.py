@@ -16,7 +16,7 @@ DEBUG = False
 # }
 
 # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = ["medoc-api.herokuapp.com"]
+ALLOWED_HOSTS = ["*", "medoc-api.herokuapp.com"]
 
 
 STATIC_URL = "/static/"

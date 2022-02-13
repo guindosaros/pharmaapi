@@ -14,7 +14,7 @@ from django.core.wsgi import get_wsgi_application
 
 if os.environ.get("ENV") != "PROD":
     if os.environ.get("ENV") == "TEST":
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "exper_config.test")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pharmaapi.test")
     else:
         dotenv.read_dotenv(dotenv=".env")
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pharmaapi.development")
