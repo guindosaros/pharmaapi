@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "import_export",
     "drf_yasg",
+    "django_filters",
     # Application
     "medocapi.apps.MedocapiConfig",
 ]
@@ -58,6 +59,11 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ),
 }
 
 JWT_AUTH = {

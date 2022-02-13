@@ -1,18 +1,15 @@
-from ast import mod
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_404_NOT_FOUND,
-)
 
-from medocapi import serializers, models, schema
+
+from medocapi import serializers, models, schema, filters
 
 
 class MedicamentViewSet(ReadOnlyModelViewSet):
 
     serializer_class = serializers.MedicamentSerializer
     detail_serializer_class = serializers.DetailMedicamentsSerializer
+    filterset_class = filters.MedicamentsFilter
     lookup_field = "code"
 
     @swagger_auto_schema(responses=schema.medicament_schema)
