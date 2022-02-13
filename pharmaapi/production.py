@@ -16,5 +16,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_URL = "/media/"  # or any prefix you choose
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+
 
 django_heroku.settings(locals())
