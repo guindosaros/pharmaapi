@@ -1,0 +1,13 @@
+language: python
+python:
+  - 3.10.0
+services:
+  - postgresql
+install:
+  - pip install -r requirements.txt
+  - python manage.py makemigrations
+  - python manage.py migrate
+before_script:
+  - sleep 10
+script:
+  - python manage.py test
