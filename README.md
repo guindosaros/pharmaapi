@@ -1,6 +1,1 @@
-# Titre de niveau 1
-### Titre de Niveau 3
-
-```
-print('hello world')
-```
+[![Build Status](https://app.travis-ci.com/guindosaros/pharmaapi.svg?branch=master)](https://app.travis-ci.com/guindosaros/pharmaapi)
