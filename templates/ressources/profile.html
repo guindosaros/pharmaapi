@@ -1,0 +1,851 @@
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/validators.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/@johmun/vue-tags-input/dist/vue-tags-input.js"></script>
+<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+<script>
+    Vue.use(window.vuelidate.default)
+    const { required, minLength, email, sameAs, maxStartDate } = window.validators;
+    var app = new Vue({
+        el: '#profile_freelance',
+        data: {
+            profile_load_skeleton:true,
+            file: null,
+            image_url: "{% if freelance.photo %} {{ freelance.photo.url }} {% else %} {% static 'images/avatar.png' %} {% endif %}",
+            // PATCH
+            display_patch: false,
+            current_formation_id: "",
+            current_experience_id: "",
+            current_certificate_id: "",
+            // Send
+            on_send: false,
+            user_data: {},
+            description: "",
+            user_id: "{{ request.user.freelance.id }}",
+            base_url: window.location.protocol + "//" + window.location.host + "/",
+            // Tagset
+            competence_tags: [],
+            experience_tags: [],
+            certificate_tags: [],
+            langages: [],
+            formation: {
+                "status": true,
+                "libelle": "",
+                "annee": "",
+                "description": "",
+                "etablissement": "",
+                "user": "{{ request.user.freelance.id }}"
+            },
+            certification: {
+                "status": true,
+                "libelle": "",
+                "organismemail": "",
+                "description": "",
+                "annee": "",
+                "lien": "",
+                "user": "{{ request.user.freelance.id }}",
+                "competences": []
+            },
+            experience: {
+                "status": true,
+                "societe": "",
+                "secteur_activite": "",
+                "titre_post": "",
+                "location": "",
+                "freelance": false,
+                "toujour_actualite": false,
+                "date_debut": "",
+                "date_fin": "",
+                "description_post": "",
+                "competences_mises_en_oeuvre": [],
+                "user": "{{ request.user.freelance.id }}"
+            },
+            autocompleteItems: [
+                {
+                    "id": 31,
+                    "libelle": "C#",
+                    "categorie": {
+                        "id": 7,
+                        "libelle": "Langages"
+                    }
+                },
+                {
+                    "id": 32,
+                    "libelle": "Graphisme",
+                    "categorie": null
+                },
+                {
+                    "id": 33,
+                    "libelle": "PHP",
+                    "categorie": {
+                        "id": 7,
+                        "libelle": "Langages"
+                    }
+                },
+                {
+                    "id": 34,
+                    "libelle": "Rédaction web",
+                    "categorie": null
+                },
+                {
+                    "id": 35,
+                    "libelle": "Webdesign",
+                    "categorie": null
+                }
+            ],
+            tag: '',
+            // model to restore the tag if the user clicks 'cancel'
+            tagBeforeEditing: null,
+            editingTag: null,
+
+            patch_description: false,
+            //experience
+            on_send_experience: false,
+            on_patch_experience: false,
+            on_delete_experience: false,
+
+            //formation
+            on_send_formation: false,
+            on_pacth_formation: false,
+            on_delete_formation: false,
+
+            //certification
+            on_send_certification: false,
+            on_patch_certification: false,
+            on_delete_certification: false,
+
+            //competence
+            on_send_competence: false,
+
+            //image
+            path_to_image: false,
+        },
+        validations: {
+            user_data: {
+                first_name: {
+                    minLength: minLength(3),
+                    required,
+                },
+                last_name: {
+                    minLength: minLength(3),
+                    required,
+                },
+                titre_profile: {
+                    minLength: minLength(10),
+                    required,
+                },
+                disponible: {
+                    required,
+                },
+                tjm: {
+                    required,
+                },
+                experience_year: {
+                    required,
+                },
+                biographie: {
+                    minLength: minLength(10),
+                    required,
+                },
+            },
+            formation: {
+                libelle: {
+                    minLength: minLength(2),
+                    required,
+                },
+                etablissement: {
+                    minLength: minLength(4),
+                    required,
+                },
+                description: {
+                    minLength: minLength(10),
+                    required,
+                },
+                annee: {
+                    required,
+                },
+            },
+            certification: {
+                libelle: {
+                    minLength: minLength(4),
+                    required,
+                },
+                organismemail: {
+                    minLength: minLength(4),
+                    required,
+                },
+                description: {
+                    minLength: minLength(20),
+                    required,
+                },
+                annee: {
+                    required,
+                },
+                lien: {
+                    required,
+                },
+            },
+            experience: {
+                societe: {
+                    minLength: minLength(2),
+                    required,
+                },
+                secteur_activite: {
+                    minLength: minLength(4),
+                    required,
+                },
+                titre_post: {
+                    minLength: minLength(4),
+                    required,
+                },
+                location: {
+                    minLength: minLength(4),
+                    required,
+                },
+                date_debut: {
+                    required,
+                },
+                description_post: {
+                    minLength: minLength(20),
+                    required,
+                },
+            },
+
+            validationExperienceGroup: [
+                'experience.societe',
+                'experience.secteur_activite',
+                'experience.titre_post',
+                'experience.location',
+                'experience.date_debut',
+                'experience.description_post'
+            ],
+
+            validationCertificationGroup: [
+                'certification.libelle',
+                'certification.organismemail',
+                'certification.description',
+                'certification.annee',
+                'certification.lien',
+            ],
+
+            validationFormationGroup: [
+                'formation.libelle',
+                'formation.etablissement',
+                'formation.description',
+                'formation.annee',
+            ],
+
+            validationDescriptionGroup: ['user_data.biographie'],
+
+            validationUserGroup: [
+                'user_data.first_name',
+                'user_data.last_name',
+                'user_data.titre_profile',
+                'user_data.disponible',
+                'user_data.tjm',
+                'user_data.experience_year',
+            ],
+        },
+        delimiters: ["${", "}"],
+        created: function () {
+            // `this` points to the vm instance
+            this.rename();
+        },
+        mounted() {
+            this.get_competences();
+            this.get_user_data();
+            /*
+            // Display a warning toast, with no title
+            toastr.warning('My name is Inigo Montoya. You killed my father, prepare to die!')
+
+            // Display a success toast, with a title
+            toastr.success('Have fun storming the castle!', 'Miracle Max Says')
+
+            // Display an error toast, with a title
+            toastr.error('I do not think that word means what you think it means.', 'Inconceivable!')
+
+
+            // Override global options
+            toastr.success('We do have the Kapua suite available.', 'Turtle Bay Resort', { timeOut: 5000 })
+
+            */
+        },
+        computed: {
+
+            taglistItems: function () {
+                return this.autocompleteItems.filter(i => {
+                    return accent_fold(i.text.toLowerCase()).indexOf(accent_fold(this.tag.toLowerCase())) !== -1;
+                });
+
+            },
+            accent_fold(s) {
+                if (!s) { return ''; }
+
+                var ret = '';
+                for (var i = 0; i < s.length; i++) {
+                    ret += accent_map[s.charAt(i)] || s.charAt(i);
+                }
+                return ret;
+            }
+        },
+        methods: {
+            status(validation) {
+                return {
+                    error: validation.$error,
+                    dirty: validation.$dirty
+                }
+            },
+
+            display_add: function () {
+                this.display_patch = false;
+            },
+
+            patch_user: function () {
+                this.on_send = true;
+                const json_data = {
+                    "first_name": this.user_data.first_name,
+                    "last_name": this.user_data.last_name,
+                    "titre_profile": this.user_data.titre_profile,
+                    "experience_year": this.user_data.experience_year,
+                    "tjm": this.user_data.tjm,
+                    "disponible": this.user_data.disponible,
+
+                }
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.patch("/api/account/freelance/" + this.user_id + "/", json_data)
+                    .then(response => {
+                        this.get_user_data()
+                        console.log("patch done!")
+                        this.on_send = false;
+                        $('#profil_info').modal('hide');
+                        toastr.success("Mise à jour effectué avec succès!", "Mise à jour ok!", { timeOut: 10000 })
+
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_send = false;
+                        toastr.error("Impossible de mettre à jour vos informations, vérifier que vous avez bien coché les champs", "Erreure de modification!", { timeOut: 10000 })
+
+                    });
+            },
+            patch_user_description: function () {
+                this.patch_description = true;
+                console.log("hello world")
+                const json_data = { "biographie": this.user_data.biographie }
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.patch("/api/account/freelance/" + this.user_id + "/", json_data)
+                    .then(response => {
+                        console.log("patch done!")
+                        this.patch_description = false;
+                        $('#description').modal('hide');
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.patch_description = false;
+                    });
+            },
+
+            patch_image: function () {
+                this.path_to_image = true;
+                let formData = new FormData();
+                formData.append('photo', this.file)
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.patch("/api/account/freelance/" + this.user_id + "/", formData)
+                    .then(response => {
+                        this.path_to_image = false;
+                        this.get_user_data()
+                        console.log("patch image done!")
+                    })
+                    .catch((err) => {
+                        this.path_to_image = false;
+                        console.log(err);
+                    });
+            },
+
+            handleFileUpload() {
+                this.file = this.$refs.file.files[0];
+                this.image_url = URL.createObjectURL(this.file);
+                let img = document.getElementById('photo-profile')
+                img.setAttribute("src", this.image_url);
+                this.patch_image()
+            },
+
+
+            /* Beguin Certification */
+            send_certificate: function () {
+                if (this.certificate_tags.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        html: '<h4>Veuillez ajoutez des compétences.</h4>',
+                    });
+                } else {
+                    this.on_send_certification = true;
+                    let competences = []
+                    this.certificate_tags.forEach(function (value, i) {
+                        competences.push(value.id);
+                    });
+                    console.log(competences)
+                    this.certification.competences = competences
+                    const json_data = this.certification
+                    axios.defaults.xsrfCookieName = 'csrftoken';
+                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                    axios.post("/api/account/freelance/" + this.user_id + "/certification/", json_data)
+                        .then(response => {
+                            this.get_user_data()
+                            this.on_send_certification = false;
+                            this.certificate_tags = []
+                            this.reset_json_certificat(this.certification)
+                            $('#certification').modal('hide');
+                            toastr.success("Certification ajouté avec succès!", "Création ok!", { timeOut: 10000 })
+
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            this.on_send_certification = false;
+                            toastr.error("Impossible d'ajouter cette certification", "Erreure de création!", { timeOut: 10000 })
+                        });
+                }
+            },
+
+            display_patch_certification: function (certification_id) {
+                var filtered = this.user_data.certifications.filter(a => a.id == certification_id);
+                console.log(filtered[0]);
+                this.certification = {
+                    "libelle": filtered[0].libelle,
+                    "organismemail": filtered[0].organismemail,
+                    "description": filtered[0].description,
+                    "annee": filtered[0].annee,
+                    "lien": filtered[0].lien,
+                }
+                this.current_certificate_id = certification_id;
+                this.display_patch = true;
+
+                var result = filtered[0].competences.map(item => ({ "id": item.id, "text": item.libelle, "tiClasses": ["ti-valid"] }));
+                this.certificate_tags = result;
+            },
+
+            patch_certification: function () {
+                if (this.certificate_tags.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        html: '<h4>Veuillez ajoutez des compétences.</h4>',
+                    });
+                } else {
+                    this.on_patch_certification = true;
+                    let competences = []
+                    this.certificate_tags.forEach(function (value, i) {
+                        competences.push(value.id);
+                    });
+                    this.certification.competences = competences
+                    const json_data = this.certification
+                    axios.defaults.xsrfCookieName = 'csrftoken';
+                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                    axios.patch("/api/account/freelance/" + this.user_id + "/certification/" + this.current_certificate_id + "/", json_data)
+                        .then(response => {
+                            this.get_user_data()
+                            this.on_patch_certification = false;
+                            this.certificate_tags = []
+                            this.reset_json_certificat(this.certification)
+                            $('#certification').modal('hide');
+                            toastr.success("Mise à jour effectué avec succès!", "Mise à jour ok!", { timeOut: 10000 })
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            this.on_patch_certification = false;
+                            toastr.error("Impossible d'effectuer la modification, Merci de verifier que les champs saisi son correcte", "Erreure de modification!", { timeOut: 10000 })
+                        });
+                }
+            },
+
+            delete_certification: function () {
+                this.on_delete_certification = true;
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.delete("/api/account/freelance/" + this.user_id + "/certification/" + this.current_certificate_id + "/")
+                    .then(response => {
+                        this.get_user_data()
+                        this.on_delete_certification = false;
+                        $('#certification').modal('hide');
+                        toastr.success("Certification supprimé avec succès!", "Suppression Ok!", { timeOut: 10000 })
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_delete_certification = false;
+                        toastr.error("Impossible de supprimer cette certification", "Erreure de suppression!", { timeOut: 10000 })
+                    });
+            },
+
+            reset_json_certificat: function (obj) {
+                for (item in obj) {
+                    obj[item] = ""
+                }
+                obj["user"] = "{{ request.user.freelance.id }}"
+                obj["status"] = true;
+                obj["competences"] = []
+                return obj
+            },
+            /* End Certification */
+
+
+            /* Beguin Expérience */
+            send_experience: function () {
+                if (this.experience_tags.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        html: '<h4>Veuillez ajoutez des compétences.</h4>',
+                    });
+                } else {
+                    this.on_send_experience = true;
+                    //console.log("send_experience")
+                    let competences = []
+                    this.experience_tags.forEach(function (value, i) {
+                        competences.push(value.id);
+                    });
+                    this.experience.competences_mises_en_oeuvre = competences
+                    if (this.experience.toujour_actualite) {
+                        delete this.experience.date_fin
+                    }
+                    const json_data = this.experience
+                    axios.defaults.xsrfCookieName = 'csrftoken';
+                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                    axios.post("/api/account/freelance/" + this.user_id + "/experience/", json_data)
+                        .then(response => {
+                            this.get_user_data()
+                            this.reset_json_experience(this.experience)
+                            this.experience_tags = [];
+                            this.on_send_experience = false;
+                            $('#experience').modal('hide');
+                            toastr.success("Competence ajouté avec succès!", "Création ok!", { timeOut: 10000 })
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            this.on_send_experience = false;
+                            toastr.error("Impossible d'ajouter cette experience", "Erreure de création!", { timeOut: 10000 })
+                        });
+                }
+            },
+
+            display_patch_experience: function (experience_id) {
+                console.log("experience", experience_id)
+                var filtered = this.user_data.freelance_experience.filter(a => a.id == experience_id);
+                this.experience = {
+                    "status": filtered[0].status,
+                    "societe": filtered[0].societe,
+                    "secteur_activite": filtered[0].secteur_activite,
+                    "titre_post": filtered[0].titre_post,
+                    "location": filtered[0].location,
+                    "freelance": filtered[0].freelance,
+                    "toujour_actualite": filtered[0].toujour_actualite,
+                    "date_debut": filtered[0].date_debut,
+                    "date_fin": filtered[0].date_fin,
+                    "description_post": filtered[0].description_post,
+                    // "competences_mises_en_oeuvre": [],
+                }
+                this.current_experience_id = experience_id;
+                this.display_patch = true;
+
+                var result = filtered[0].competences_mises_en_oeuvre.map(item => ({ "id": item.id, "text": item.libelle, "tiClasses": ["ti-valid"] }));
+                this.experience_tags = result;
+
+                // filtered[0];
+            },
+
+            patch_experience: function () {
+                if (this.experience_tags.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        html: '<h4>Veuillez ajoutez des compétences.</h4>',
+                    });
+                } else {
+                    this.on_patch_experience = true;
+                    console.log("patch", this.current_experience_id)
+                    let competences = []
+                    this.experience_tags.forEach(function (value, i) {
+                        competences.push(value.id);
+                    });
+                    this.experience.competences_mises_en_oeuvre = competences
+                    if (this.experience.toujour_actualite) {
+                        delete this.experience.date_fin
+                    }
+                    const json_data = this.experience
+                    axios.defaults.xsrfCookieName = 'csrftoken';
+                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                    axios.patch("/api/account/freelance/" + this.user_id + "/experience/" + this.current_experience_id + "/", json_data)
+                        .then(response => {
+                            this.get_user_data()
+                            this.reset_json_experience(this.experience)
+                            this.experience_tags = [];
+                            this.on_patch_experience = false;
+                            $('#experience').modal('hide');
+                            toastr.success("Competence modifié avec succès!", "Modification Ok!", { timeOut: 10000 })
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            this.on_patch_experience = false;
+                            toastr.error("Impossible modifier cette experience", "Erreure de modification!", { timeOut: 10000 })
+                        });
+                }
+            },
+
+            delete_experience: function () {
+                this.on_delete_experience = true;
+                console.log("delete", this.current_experience_id)
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.delete("/api/account/freelance/" + this.user_id + "/experience/" + this.current_experience_id + "/")
+                    .then(response => {
+                        this.get_user_data();
+                        this.on_delete_experience = false;
+                        this.reset_json_experience(this.experience)
+                        this.experience_tags = [];
+                        $('#experience').modal('hide');
+                        toastr.success("Experience ajouté avec succès!", "Création Ok!", { timeOut: 10000 })
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_delete_experience = false;
+                        toastr.error("Impossible de supprimer cette experience", "Erreure de suppression!", { timeOut: 10000 })
+                    });
+            },
+
+            reset_json_experience: function (obj) {
+                for (item in obj) {
+                    obj[item] = ""
+                }
+                obj["user"] = "{{ request.user.freelance.id }}"
+                obj["freelance"] = false;
+                obj["status"] = true;
+                obj["toujour_actualite"] = false;
+                obj["competences_mises_en_oeuvre"] = []
+                return obj
+            },
+            /* End experience */
+
+            /* Beguin Formation  */
+            send_formation: function () {
+                this.on_send_formation = true;
+                const json_data = this.formation
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.post("/api/account/freelance/" + this.user_id + "/formation/", json_data)
+                    .then(response => {
+                        this.get_user_data();
+                        this.on_send_formation = false;
+                        this.reset_json_formation(this.formation)
+                        $('#formation').modal('hide');
+                        toastr.success("La formation a été créée avec succès!", "Création Ok!", { timeOut: 10000 })
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_send_formation = false;
+                        toastr.error("Impossible d'ajouter la formation. Vérifier que vous avez bien remplir tous les champs", "Erreure de création!", { timeOut: 10000 })
+                    });
+            },
+
+            display_patch_form: function (formation_id) {
+                console.log("formation", formation_id)
+                var filtered = this.user_data.formations.filter(a => a.id == formation_id);
+                this.formation = {
+                    "libelle": filtered[0].libelle,
+                    "annee": filtered[0].annee,
+                    "description": filtered[0].description,
+                    "etablissement": filtered[0].etablissement,
+                }
+                this.current_formation_id = formation_id;
+                this.display_patch = true;
+            },
+
+            patch_form_data: function () {
+                this.on_pacth_formation = true;
+                const json_data = this.formation
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.patch("/api/account/freelance/" + this.user_id + "/formation/" + this.current_formation_id + "/", json_data)
+                    .then(response => {
+                        this.get_user_data()
+                        this.on_pacth_formation = false;
+                        this.reset_json_formation(this.formation)
+                        $('#formation').modal('hide');
+                        toastr.success("La formation a été mise à jour avec succès!", "Mise à jour Ok!", { timeOut: 10000 })
+
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_pacth_formation = false;
+                        toastr.error("La formation ne peut pas être mise à jour. Merci de vérififier vos modifications", "Erreure de mise à jour!", { timeOut: 10000 })
+                    });
+                // PATCH HERE
+            },
+
+            delete_formation: function () {
+                this.on_delete_formation = true;
+                console.log(this.current_formation_id)
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.delete("/api/account/freelance/" + this.user_id + "/formation/" + this.current_formation_id + "/")
+                    .then(response => {
+                        this.get_user_data();
+                        this.on_delete_formation = false;
+                        $('#formation').modal('hide');
+                        toastr.success("La formation a été supprimé avec succès!", "Suppression Ok!", { timeOut: 10000 })
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_delete_formation = false;
+                        toastr.error("Impossible de supprimer cette formation", "Erreure de suppression!", { timeOut: 10000 })
+                    });
+            },
+
+            reset_json_formation: function (obj) {
+                for (item in obj) {
+                    obj[item] = ""
+                }
+                obj["user"] = "{{ request.user.freelance.id }}"
+                obj["status"] = true;
+                return obj
+            },
+            /* End Formation */
+
+
+            /* Beguin Competence */
+            send_competences: function () {
+                if (this.competence_tags.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        html: '<h4>Veuillez ajoutez des compétences.</h4>',
+                    });
+                } else {
+                    this.on_send_competence = true;
+                    //console.log("send competences")
+                    let competences = []
+                    let user_id = this.user_id
+                    this.competence_tags.forEach(function (value, i) {
+                        data = {
+                            "competence": value.id,
+                            "status": true,
+                            "user": user_id,
+                        }
+                        competences.push(data);
+                    });
+                    //console.log(competences)
+
+                    const json_data = competences
+                    axios.defaults.xsrfCookieName = 'csrftoken';
+                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                    axios.post("/api/account/freelance/" + this.user_id + "/competence/", json_data)
+                        .then(response => {
+                            this.get_user_data();
+                            this.on_send_competence = false;
+                            $('#competence').modal('hide');
+                            toastr.success("Compétance ajouté avec succès!", "Félicitation!", { timeOut: 10000 })
+                        })
+                        .catch((err) => {
+                            toastr.error("La compétance que vous éssayez d\'ajouter, existe déjà", "Erreure d'ajouter!", { timeOut: 10000 })
+                            this.on_send_competence = false;
+                        });
+                }
+            },
+
+            show_delete_competence: function (competence_id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2F86A6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.delete_competence(competence_id)
+                    }
+                })
+            },
+
+            delete_competence: function (competence_id) {
+
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.delete("/api/account/freelance/" + this.user_id + "/competence/" + competence_id + "/")
+                    .then(response => {
+                        this.get_user_data();
+                        Swal.fire(
+                            'Deleted!',
+                            'Your competence has been deleted.',
+                            'success'
+                        )
+                    })
+                    .catch((err) => {
+                        console.log(err);
+
+                    });
+            },
+
+            /* End Competence */
+
+
+            get_user_data: function () {
+                // this.user_data = {}
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.get("/api/account/freelance/" + this.user_id + "/")
+                    .then(response => {
+                        this.user_data = response.data
+                        this.profile_load_skeleton = false;
+                    })
+                    .catch((err) => { console.log(err); });
+            },
+            get_competences: function () {
+
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.get("/api/common/competence-item/?limit=300")
+                    .then(response => {
+                        this.autocompleteItems = response.data.results;
+                        this.rename();
+                    })
+                    .catch((err) => { console.log(err); });
+            },
+
+            // TAGS
+
+            setTag(tag) {
+                // find the tag in the array (remember browser support of: findIndex)
+                const index = this.tags.findIndex(t => t.id === tag.id);
+
+                // apply the changed/original tag to the model in the array
+                this.$set(this.tags, index, tag);
+
+                // close the edit mode
+                this.editingTag = null;
+            },
+            editTag(handler) {
+                this.$nextTick(() => {
+                    // make a copy to restore the tag if the user clicks 'cancel'
+                    this.tagBeforeEditing = Object.assign({}, handler.tag);
+
+                    // we use this as model to edit the tag's properties
+                    this.editingTag = handler.tag
+                });
+            },
+
+            rename() { // function to rename on button click
+                this.autocompleteItems = this.autocompleteItems.map(function (obj) {
+                    obj['text'] = obj['libelle']; // Assign new key
+                    delete obj['libelle']; // Delete old key
+                    return obj;
+                });
+
+            },
+        },
+    })
+
+
+
+</script>

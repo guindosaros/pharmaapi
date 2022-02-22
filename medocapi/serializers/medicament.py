@@ -9,7 +9,8 @@ class MedicamentSerializer(ModelSerializer):
 
     class Meta:
         model = models.Medicaments
-        fields = ("id", "code", "nom", "ppv", "status", "date_add", "date_upd")
+        fields = "__all__"
+        # fields = ("id", "code", "nom", "ppv", "status", "date_add", "date_upd")
         lookup_field = "code"
 
 

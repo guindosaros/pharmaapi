@@ -1,0 +1,983 @@
+{% extends "base/bases/developper.html" %}
+{% load static %}
+
+
+{% block css %}
+<style>
+    .competence-img {
+        margin-left: 10px;
+        height: 15px;
+        width: auto;
+        cursor: pointer;
+    }
+
+    .btn-disable {
+        border: 1px solid #f1f1f1;
+        background-color: #f1f1f1;
+        color: black;
+        box-shadow: initial;
+        padding: 1.2rem 5rem !important;
+        font-size: 1.4rem;
+        font-weight: bold;
+        cursor: no-drop;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<main class="dashboard-content" id="profile_freelance">
+    <div class="container">
+        <div class="box_skeleton_profil" v-if="profile_load_skeleton">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+                    <div class="card_skeleton">
+                        <div class="skeleton-box --avatar"></div>
+                        <div class="skeleton-box --line_1 --center"></div>
+                        <div class="skeleton-box --line_2 --center"></div>
+                    </div>
+                    <div class="card_skeleton">
+                        <div class="skeleton-box --line_1" style="margin-bottom: 6px;"></div>
+                        <div class="skeleton-box --line_2" style="margin-bottom: 6px;"></div>
+                        <div class="skeleton-box --button" style="margin-bottom: 10px; margin-top: 10px; width: 50%;"></div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+                    <div class="card_skeleton">
+                        <div class="skeleton-box --line_1" style="margin-bottom: 10px;"></div>
+                        <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 25%;"></div>
+                        <div class="skeleton_flex">
+                            <div class="skeleton-box --line_1" style="margin-bottom: 8px; width: 20%;  height: 4rem;"></div>
+                            <div class="skeleton-box --line_1" style="margin-bottom: 8px; width: 20%;  height: 4rem;"></div>
+                        </div>
+                        <div style="margin-bottom: 1rem;"></div>
+                        <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 28%;"></div>
+                        <div class="skeleton_flex">
+                            <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 20%; height: 4rem;"></div>
+                            <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 20%; height: 4rem;"></div>
+                        </div>
+                        <div class="skeleton-box --button" style="margin-bottom: 10px; margin-top: 10px"></div>
+                    </div>
+                    <div class="card_skeleton">
+                        <div class="skeleton-box --line_1" style="margin-bottom: 10px;"></div>
+                        <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 65%; height: 5rem;"></div>
+                        <div class="skeleton-box --button" style="margin-bottom: 10px; margin-top: 10px"></div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="profil" v-if='!profile_load_skeleton'>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+                    <div class="box-content position-relative">
+                        <div class="icon-md  --absolute" data-bs-toggle="modal" data-bs-target="#profil_info">
+                            <img src="{% static 'icons/pencil.png' %}" alt="modifier">
+                        </div>
+                        <div class="profil-info-gen">
+                            <div class="avatar-upload" v-if="!path_to_image">
+                                <div class="avatar-edit">
+                                    <input type='file' ref="file" id="imageUpload" v-on:change="handleFileUpload()"
+                                        accept=".png, .jpg, .jpeg" />
+                                    <label for="imageUpload"></label>
+                                </div>
+                                <div class="avatar-preview">}
+                                    <div id="imagePreview"
+                                        v-bind:style="{'background-image': 'url(' + image_url + ')'}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box_skeleton_profil" v-if=path_to_image>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+                                        <div class="card_skeleton">
+                                            <div class="skeleton-box --avatar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profil-info">
+                                <h2 v-html="user_data.first_name"></h2>
+                                <h4 v-html="user_data.titre_profile"></h4>
+                                <div class="availablity">
+
+                                    <div class="icon"></div>
+                                    <span v-if="user_data.disponible">Disponibilité confirmée</span>
+                                    <span v-if="!user_data.disponible">Indisponible</span>
+
+                                </div>
+                                <div class="info-item">
+                                    <div class="icon">
+                                        <img src="{% static 'icons/walk.png' %}" alt="walk">
+                                    </div>
+                                    <span>Peut se déplacer à ${ user_data.location }</span>
+                                </div>
+                            </div>
+                            <div class="box">
+                                <span>Tarif indicatif</span>
+                                <h4 class="tarif">${ user_data.tjm } XOF <span>/ jour</span></h4>
+                            </div>
+                            <div class="box  --dark">
+                                <span>Expérience</span>
+                                <h4 class="tarif" v-html="user_data.experience_year"> </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-content">
+                        <div class="box-profil">
+                            <div class="head">
+                                <h3>Localisation et déplacement</h3>
+                            </div>
+                            <div class="item">
+                                <div class="icon">
+                                    <img src="{% static 'icons/broche-de-localisation.png' %}" alt="localisation">
+                                </div>
+                                <div class="desc">
+                                    <h5>Localisation</h5>
+                                    <span v-html="user_data.location"></span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="icon">
+                                    <img src="{% static 'icons/walk.png' %}" alt="walk">
+                                </div>
+                                <div class="desc">
+                                    <h5>Peut travailler dans vos locaux à</h5>
+                                    <span>&bull; ${ user_data.location } et 50km autour</span>
+                                    <span>&bull; ${ user_data.location } et 100km autour</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+                    <!-- box competence-->
+                    <div class="box-content">
+                        <div class="box-profil">
+                            <div class="head">
+                                <h3>Compétences ({{ freelance.freelance_usercompetence.count }})</h3>
+                                <!-- <div class="icon-md" data-bs-toggle="modal" data-bs-target="#competence">
+                                    <img src="{% static 'icons/pencil.png' %}" alt="modifier">
+                                </div> -->
+                            </div>
+                            <div class="skills">
+                                <h4>Technologies et outils</h4>
+                                <div class="skills-content">
+                                    <div class="skill-item" v-for="competence in user_data.freelance_usercompetence">
+                                        <div v-on:click="show_delete_competence(competence.id)" class="icon_delete"><i
+                                                class="fa fa-close"></i></div>
+                                        <span v-html="competence.competence.libelle"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button v-on:click="display_add" class="btn-standard --green mt-5" data-bs-toggle="modal"
+                                data-bs-target="#competence">Ajouter une compétence</button>
+
+                        </div>
+                        <!-- <div class="box_skeleton_profil" v-if="!user_data">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+                                    <div class="card_skeleton">
+                                        <div class="skeleton-box --line_1" style="margin-bottom: 10px;"></div>
+                                        <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 25%;"></div>
+                                        <div class="skeleton_flex">
+                                            <div class="skeleton-box --line_1" style="margin-bottom: 8px; width: 20%;  height: 4rem;"></div>
+                                            <div class="skeleton-box --line_1" style="margin-bottom: 8px; width: 20%;  height: 4rem;"></div>
+                                        </div>
+                                        <div style="margin-bottom: 1rem;"></div>
+                                        <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 28%;"></div>
+                                        <div class="skeleton_flex">
+                                            <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 20%; height: 4rem;"></div>
+                                            <div class="skeleton-box --line_1" style="margin-bottom: 10px; width: 20%; height: 4rem;"></div>
+                                        </div>
+                                        <div class="skeleton-box --button" style="margin-bottom: 10px; margin-top: 10px"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+
+                    <!-- box description -->
+                    <div class="box-content">
+                        <div class="box-profil">
+                            <div class="head">
+                                <h3>Vous en quelques mots</h3>
+                            </div>
+                            <p v-html="user_data.biographie"> </p>
+                            <button class="btn-standard --green mt-4" data-bs-toggle="modal"
+                                data-bs-target="#description">Modifier</button>
+                        </div>
+                    </div>
+
+                    <!-- box experience -->
+                    <div class="box-content">
+                        <div class="box-profil">
+                            <div class="head">
+                                <h3>Expériences</h3>
+                            </div>
+
+                            <div class="item" v-for="experience in user_data.freelance_experience">
+                                <div class="icon --big">
+                                    <img src="{% static 'icons/office-building.png' %}" alt="entreprise">
+                                </div>
+                                <div class="desc">
+                                    <h5 v-html="experience.societe"></h5>
+                                    <div class="post">
+                                        <h6>${ experience.titre_post } <span v-if="experience.freelance">&ndash; en
+                                                tant que freelance</span></h6>
+                                    </div>
+                                    <span v-html="experience.secteur_activite"></span>
+                                    <div class="info-ets">
+                                        <div class="it-item">
+                                            <div class="it-icon">
+                                                <img src="{% static 'icons/broche-de-localisation.png' %}"
+                                                    alt="localisation">
+                                            </div>
+                                            <span v-html="experience.location"></span>
+                                        </div>
+                                        <div class="it-item">
+                                            <div class="it-icon">
+                                                <img src="{% static 'icons/calendar.png' %}" alt="calendar">
+                                            </div>
+                                            <span>${ experience.date_debut } - ${ experience.date_fin }</span>
+                                        </div>
+                                    </div>
+                                    <p v-html="experience.description_post"></p>
+                                    <div class="skills">
+                                        <div class="skills-content">
+                                            <div class="skill-item --green"
+                                                v-for="comp in experience.competences_mises_en_oeuvre">
+                                                <span v-html="comp.libelle"></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-on:click="display_patch_experience(experience.id)" class="icon-md"
+                                    data-bs-toggle="modal" data-bs-target="#experience">
+                                    <img src="{% static 'icons/pencil.png' %}" alt="modifier">
+                                </div>
+                            </div>
+                            <button v-on:click="display_add" class="btn-standard --green mt-5" data-bs-toggle="modal"
+                                data-bs-target="#experience">Ajouter une expérience</button>
+
+                        </div>
+                    </div>
+
+                    <!-- box formation -->
+                    <div class="box-content">
+                        <div class="box-profil">
+                            <div class="head">
+                                <h3>Formations</h3>
+                            </div>
+                            <div class="item" v-for="form in user_data.formations">
+                                <div class="icon --big">
+                                    <img src="{% static 'icons/graduated.png' %}" alt="graduated">
+                                </div>
+                                <div class="desc">
+                                    <h5 v-html="form.libelle"></h5>
+                                    <div class="info-ets">
+                                        <div class="it-item">
+                                            <div class="it-icon">
+                                                <img src="{% static 'icons/broche-de-localisation.png' %}" alt="local">
+                                            </div>
+                                            <span v-html="form.etablissement"></span>
+                                        </div>
+                                        <div class="it-item">
+                                            <div class="it-icon">
+                                                <img src="{% static 'icons/calendar.png' %}" alt="calendar">
+                                            </div>
+                                            <span v-html="form.annee">2020</span>
+                                        </div>
+                                    </div>
+                                    <p v-html="form.description"></p>
+
+                                </div>
+                                <div v-on:click="display_patch_form(form.id)" class="icon-md" data-bs-toggle="modal"
+                                    data-bs-target="#formation">
+                                    <img src="{% static 'icons/pencil.png' %}" alt="modifier">
+                                </div>
+                            </div>
+                            <button v-on:click="display_add" class="btn-standard --green mt-5" data-bs-toggle="modal"
+                                data-bs-target="#formation">Ajouter une formation</button>
+                        </div>
+                    </div>
+
+                    <!-- box certification -->
+                    <div class="box-content">
+                        <div class="box-profil">
+                            <div class="head">
+                                <h3>Certifications</h3>
+                            </div>
+                            <div class="item" v-for="certify in user_data.certifications">
+                                <div class="icon --big">
+                                    <img src="{% static 'icons/certificate.png' %}" alt="certificate">
+                                </div>
+                                <div class="desc">
+                                    <h5 v-html="certify.libelle"></h5>
+                                    <div class="info-ets">
+                                        <div class="it-item">
+                                            <div class="it-icon">
+                                                <img src="{% static 'icons/broche-de-localisation.png' %}" alt="local">
+                                            </div>
+                                            <span v-html="certify.organismemail"></span>
+                                        </div>
+                                        <div class="it-item">
+                                            <div class="it-icon">
+                                                <img src="{% static 'icons/calendar.png' %}" alt="calendar">
+                                            </div>
+                                            <span v-html="certify.annee"></span>
+                                        </div>
+                                    </div>
+                                    <p v-html="certify.description"></p>
+                                    <div class="skills">
+                                        <div class="skills-content">
+                                            <div class="skill-item --green" v-for="comp in certify.competences">
+                                                <span v-html="comp.libelle"></span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-on:click="display_patch_certification(certify.id)" class="icon-md"
+                                    data-bs-toggle="modal" data-bs-target="#certification">
+                                    <img src="{% static 'icons/pencil.png' %}" alt="modifier">
+                                </div>
+                            </div>
+                            <button v-on:click="display_add" class="btn-standard --green mt-5" data-bs-toggle="modal"
+                                data-bs-target="#certification">Ajouter une certification</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal profil info-->
+    <div class="modal dash-modal fade" id="profil_info" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog --max-width modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modifier profil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" class="form-contact-freelance">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form--group">
+                                    <label>Nom <span>*</span></label>
+                                    <input :class="status($v.user_data.first_name)"
+                                        v-model.trim="$v.user_data.first_name.$model" type="text"
+                                        class="form--group__input">
+                                    <div class="error" v-if="!$v.user_data.first_name.required">Nom is required.</div>
+                                    <div class="error" v-if="!$v.user_data.first_name.minLength">Nom must have at least
+                                        ${ $v.user_data.first_name.$params.minLength.min } letters.</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form--group">
+                                    <label>Prénom(s) <span>*</span></label>
+                                    <input :class="status($v.user_data.last_name)"
+                                        v-model="$v.user_data.last_name.$model" type="text" class="form--group__input">
+                                    <div class="error" v-if="!$v.user_data.last_name.required">Prénom (s) is required.
+                                    </div>
+                                    <div class="error" v-if="!$v.user_data.last_name.minLength">Prénom (s) must have at
+                                        least ${ $v.user_data.last_name.$params.minLength.min } letters.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form--group">
+                            <label>Titre de votre profile <span>*</span></label>
+                            <input :class="status($v.user_data.titre_profile)"
+                                v-model="$v.user_data.titre_profile.$model" type="text" class="form--group__input">
+                            <div class="error" v-if="!$v.user_data.titre_profile.required">Titre is required.</div>
+                            <div class="error" v-if="!$v.user_data.titre_profile.minLength">Titre must have at least ${
+                                $v.user_data.titre_profile.$params.minLength.min } letters.</div>
+                        </div>
+                        <div class="form--group">
+                            <label>Êtes-vous disponible pour recevoir des propositions ?</label>
+                            <div class="flex-radio">
+                                <label class="radio">
+                                    <input :class="status($v.user_data.disponible)"
+                                        v-model="$v.user_data.disponible.$model" type="radio" value="true"
+                                        name="disponibility">
+                                    <p class="paragraph">Oui</p>
+                                    <span></span>
+                                </label>
+                                <label class="radio">
+                                    <input :class="status($v.user_data.disponible)"
+                                        v-model="$v.user_data.disponible.$model" type="radio" value="false"
+                                        name="disponibility">
+                                    <p class="paragraph">Non</p>
+                                    <span></span>
+                                </label>
+                                <div class="error" v-if="!$v.user_data.disponible.required">Choice Disponible is
+                                    required.</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form--group">
+                                    <label>Tarif indicatif (en euro)</label>
+                                    <input :class="status($v.user_data.tjm)" v-model="$v.user_data.tjm.$model"
+                                        type="number" class="form--group__input">
+                                    <div class="error" v-if="!$v.user_data.tjm.required">Tarif indicatif is required.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form--group">
+                            <label>Experience</label>
+                            <div class="flex-radio">
+                                {% for experience in experience_year %}
+                                <label class="radio">
+                                    <input :class="status($v.user_data.experience_year)"
+                                        v-model="$v.user_data.experience_year.$model" 
+                                        type="radio" 
+                                        value="{{ experience|first }}"
+                                        name="experience"
+                                    >
+                                    <p class="paragraph">{{ experience|last }}</p>
+                                    <span></span>
+                                </label>
+                                {% endfor %}
+                                <div class="error" v-if="!$v.user_data.experience_year.required">Experience is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button v-if="!this.on_send" type="button" class="btn-standard"
+                                data-bs-dismiss="modal">Annuler</button>
+
+                            <button V-if="$v.validationUserGroup.$invalid" type="button"
+                                class="btn-standard btn-disable --md" disabled>Modifier</button>
+
+                            <button v-if="!this.on_send && !$v.validationUserGroup.$invalid" type="button"
+                                v-on:click="patch_user" class="btn-standard --md">Modifier</button>
+
+                            <button type="button" v-if="this.on_send" class="btn-standard --md --btn-large">
+                                <div class="change_loader">
+                                    <div class="dot-loader"></div>
+                                    <div class="dot-loader"></div>
+                                    <div class="dot-loader"></div>
+                                </div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal competence-->
+    <div class="modal dash-modal fade" id="competence" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Compétences</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="" class="form-contact-freelance">
+                        <div class="form--group">
+                            <label for="#">Langages &amp; Framework</label>
+                            <div class="box-tags">
+                                <vue-tags-input :tags="competence_tags" v-model="tag" :disabled="!!editingTag"
+                                    :add-only-from-autocomplete="true" :autocomplete-items="taglistItems"
+                                    :allow-edit-tags="true" @before-editing-tag="editTag"
+                                    @tags-changed="newTags => competence_tags = newTags" class="input" placeholder="Ajouter vos compétences">
+                                </vue-tags-input>
+
+                                <div class="edit-tag-area" v-if="editingTag">
+                                    <input type="text" v-model="editingTag.text">
+                                    <input type="text" v-model="editingTag.categorie">
+                                    <button type="button" @click="setTag(tagBeforeEditing)">cancel</button>
+                                    <button type="button" @click="setTag(editingTag)">save</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button type="button" class="btn-standard" v-if="!on_send_competence"
+                                data-bs-dismiss="modal">Annuler</button>
+                            <button v-on:click="send_competences" v-if="!on_send_competence" type="button"
+                                class="btn-standard --md">Enregistrer</button>
+
+                            <button type="button" v-if="on_send_competence" class="btn-standard --md --btn-large">
+                                <div class="change_loader">
+                                    <div class="dot-loader"></div>
+                                    <div class="dot-loader"></div>
+                                    <div class="dot-loader"></div>
+                                </div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal description / OK-->
+    <div class="modal dash-modal fade" id="description" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Vous en quelques mots</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="" class="form-contact-freelance">
+                        <div class="form--group mb-3">
+                            <textarea :class="status($v.user_data.biographie)" class="form--group__textarea"
+                                v-model.trim="$v.user_data.biographie.$model" maxlength="100"></textarea>
+
+                            <div class="error" v-if="!$v.user_data.biographie.required">Description is required.</div>
+                            <div class="error" v-if="!$v.user_data.biographie.minLength">Description must have at least
+                                ${ $v.user_data.biographie.$params.minLength.min } letters.</div>
+                            <div v-if="this.user_data.biographie" class="d-flex justify-content-between flex-wrap">
+                                <p class="paragraph">Minimun 10 characters</p>
+                                <p class="paragraph">${ this.user_data.biographie.length }/100</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button type="button" v-if="!patch_description" class="btn-standard"
+                                data-bs-dismiss="modal">Annuler</button>
+
+                            <button V-if="$v.validationDescriptionGroup.$invalid" type="button"
+                                class="btn-standard btn-disable --md" disabled>Enregistrer</button>
+
+                            <button V-if="!$v.validationDescriptionGroup.$invalid && !patch_description" type="button"
+                                v-on:click="patch_user_description" class="btn-standard --md">Enregistrer</button>
+
+                            <button type="button" v-if="patch_description" class="btn-standard --md --btn-large">
+                                <div class="change_loader">
+                                    <div class="dot-loader"></div>
+                                    <div class="dot-loader"></div>
+                                    <div class="dot-loader"></div>
+                                </div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal experience-->
+    <div class="modal dash-modal fade" id="experience" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog --max-width modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Expériencce</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="" class="form-contact-freelance row">
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>Société <span>*</span></label>
+                                <input :class="status($v.experience.societe)"
+                                    v-model.trim="$v.experience.societe.$model" type="text" class="form--group__input">
+                                <div class="error" v-if="!$v.experience.societe.required">Societé is required.</div>
+                                <div class="error" v-if="!$v.experience.societe.minLength">Societé must have at least ${
+                                    $v.experience.societe.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label for="#">Poste occupé <span>*</span></label>
+                                <input :class="status($v.experience.titre_post)"
+                                    v-model.trim="$v.experience.titre_post.$model" type="text"
+                                    class="form--group__input">
+                                <div class="error" v-if="!$v.experience.titre_post.required">Poste occupé is required.
+                                </div>
+                                <div class="error" v-if="!$v.experience.titre_post.minLength">Poste occupé must have at
+                                    least ${ $v.experience.titre_post.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form--group">
+                                <div class="flex-radio">
+                                    <label class="checkbox">
+                                        <input v-model.trim="experience.freelance" type="checkbox" name="option">
+                                        <p class="paragraph">En tant que freelance</p>
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>Secteur d'activité <span>*</span></label>
+                                {% comment %} <input :class="status($v.experience.secteur_activite)"
+                                    v-model="$v.experience.secteur_activite.$model" type="text"
+                                    class="form--group__input"> {% endcomment %}
+                                <select :class="status($v.experience.secteur_activite)" v-model="$v.experience.secteur_activite.$model" class="form--group__input">
+                                    {% for secteur in secteurs_activites %}
+                                        <option value="{{ secteur }}">{{ secteur }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="error" v-if="!$v.experience.secteur_activite.required">Secteur d'activité is
+                                    required.</div>
+                                <div class="error" v-if="!$v.experience.secteur_activite.minLength">Secteur d'activité
+                                    must have at least ${ $v.experience.secteur_activite.$params.minLength.min }
+                                    letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>Lieu <span>*</span></label>
+                                <input :class="status($v.experience.location)" v-model="$v.experience.location.$model"
+                                    type="text" class="form--group__input">
+                                <div class="error" v-if="!$v.experience.location.required">Lieu is required.</div>
+                                <div class="error" v-if="!$v.experience.location.minLength">Lieu must have at least ${
+                                    $v.experience.location.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form--group">
+                                <div class="flex-radio">
+                                    <label class="checkbox">
+                                        <input v-model="experience.toujour_actualite" type="checkbox"
+                                            name="option_state" :value="experience.toujour_actualite">
+                                        <p class="paragraph">J'occupe actuellement ce poste</p>
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>Date de debut <span>*</span></label>
+                                <input :class="status($v.experience.date_debut)"
+                                    v-model="$v.experience.date_debut.$model" type="date" class="form--group__input">
+                                <div class="error" v-if="!$v.experience.date_debut.required">Date de debut is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group" v-if="!experience.toujour_actualite">
+                                <label for="#">Date de fin</label>
+                                <input v-model="experience.date_fin" type="date" class="form--group__input">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form--group">
+                                <label for="#">Description de la mission</label>
+                                <textarea :class="status($v.experience.description_post)"
+                                    v-model="$v.experience.description_post.$model"
+                                    class="form--group__textarea"></textarea>
+                                <div class="error" v-if="!$v.experience.description_post.required">Description de la
+                                    mission is required.</div>
+                                <div class="error" v-if="!$v.experience.description_post.minLength">Description de la
+                                    mission must have at least ${ $v.experience.description_post.$params.minLength.min }
+                                    letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form--group">
+                                <label for="#">Compétences mises en oeuvre pendant cette mission</label>
+                                <div class="box-tags">
+                                    <vue-tags-input :tags="experience_tags" v-model="tag" :disabled="!!editingTag"
+                                        :add-only-from-autocomplete="true" :autocomplete-items="taglistItems"
+                                        :allow-edit-tags="true" @before-editing-tag="editTag"
+                                        @tags-changed="newTags => experience_tags = newTags" class="input" placeholder="Ajouter vos compétences">
+                                    </vue-tags-input>
+
+                                    <div class="edit-tag-area" v-if="editingTag">
+                                        <input type="text" v-model="editingTag.text">
+                                        <input type="text" v-model="editingTag.categorie">
+                                        <button type="button" @click="setTag(tagBeforeEditing)">cancel</button>
+                                        <button type="button" @click="setTag(editingTag)">save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div style="text-align: right;">
+                                <button type="button" v-if="!display_patch && !on_send_experience" class="btn-standard"
+                                    data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" v-if="display_patch && !on_patch_experience" class="btn-standard"
+                                    data-bs-dismiss="modal">Annuler</button>
+
+                                <button V-if="$v.validationExperienceGroup.$invalid && !display_patch" type="button"
+                                    class="btn-standard btn-disable --md" disabled>Enregistrer</button>
+
+                                <button
+                                    V-if="!$v.validationExperienceGroup.$invalid && !display_patch && !on_send_experience"
+                                    v-on:click="send_experience" type="button"
+                                    class="btn-standard --md">Enregistrer</button>
+
+                                <button v-if="display_patch && !on_delete_experience" v-on:click="delete_experience"
+                                    type="button" class="btn-standard">Supprimer</button>
+
+                                <button
+                                    v-if="!$v.validationExperienceGroup.$invalid && display_patch && !on_patch_experience"
+                                    type="button" v-on:click="patch_experience"
+                                    class="btn-standard --md">Modifier</button>
+
+                                <button V-if="$v.validationExperienceGroup.$invalid && display_patch" type="button"
+                                    class="btn-standard btn-disable --md" disabled>Modifier</button>
+
+                                <button type="button"
+                                    v-if="on_send_experience || on_patch_experience || on_delete_experience"
+                                    class="btn-standard --md --btn-large">
+                                    <div class="change_loader">
+                                        <div class="dot-loader"></div>
+                                        <div class="dot-loader"></div>
+                                        <div class="dot-loader"></div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal formation-->
+    <div class="modal dash-modal fade" id="formation" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog --max-width modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Formation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="" class="form-contact-freelance row">
+                        <div class="col-12">
+                            <div class="form--group">
+                                <label>Ecole <span>*</span></label>
+                                <input :class="status($v.formation.etablissement)"
+                                    v-model.trim="$v.formation.etablissement.$model" type="text"
+                                    class="form--group__input">
+                                <div class="error" v-if="!$v.formation.etablissement.required">Ecole is required.</div>
+                                <div class="error" v-if="!$v.formation.etablissement.minLength">Ecole must have at least
+                                    ${ $v.formation.etablissement.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>Diplome <span>*</span></label>
+                                <input :class="status($v.formation.libelle)" v-model.trim="$v.formation.libelle.$model"
+                                    type="text" class="form--group__input">
+                                <div class="error" v-if="!$v.formation.libelle.required">Diplome is required.</div>
+                                <div class="error" v-if="!$v.formation.libelle.minLength">Diplome must have at least ${
+                                    $v.formation.libelle.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label for="#">Année d'obtention <span>*</span></label>
+                                <input :class="status($v.formation.annee)" v-model.trim="$v.formation.annee.$model"
+                                    type="text" class="form--group__input">
+                                <div class="error" v-if="!$v.formation.annee.required">Année d'obtention is required.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form--group">
+                                <label for="#">Indiiquer le contenu de la formation</label>
+                                <textarea :class="status($v.formation.description)"
+                                    v-model.trim="$v.formation.description.$model"
+                                    class="form--group__textarea"></textarea>
+                                <div class="error" v-if="!$v.formation.description.required">Contenu de la formation is
+                                    required.</div>
+                                <div class="error" v-if="!$v.formation.description.minLength">Contenu de la formation
+                                    must have at least ${ $v.formation.description.$params.minLength.min } letters.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div style="text-align: right;">
+                                <button type="button" v-if="!display_patch && !on_send_formation" class="btn-standard"
+                                    data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" v-if="display_patch && !on_pacth_formation" class="btn-standard"
+                                    data-bs-dismiss="modal">Annuler</button>
+
+                                <button V-if="$v.validationFormationGroup.$invalid && !display_patch" type="button"
+                                    class="btn-standard btn-disable --md" disabled>Enregistrer</button>
+
+                                <button
+                                    V-if="!$v.validationFormationGroup.$invalid && !display_patch && !on_send_formation"
+                                    type="button" v-on:click="send_formation"
+                                    class="btn-standard --md">Enregistrer</button>
+
+                                <button v-if="display_patch && !on_delete_formation" v-on:click="delete_formation"
+                                    type="button" class="btn-standard">Supprimer</button>
+
+                                <button
+                                    v-if="!$v.validationFormationGroup.$invalid && display_patch && !on_pacth_formation"
+                                    type="button" v-on:click="patch_form_data"
+                                    class="btn-standard --md">Modifier</button>
+
+                                <button V-if="$v.validationFormationGroup.$invalid && display_patch" type="button"
+                                    class="btn-standard btn-disable --md" disabled>Modifier</button>
+
+                                <button type="button"
+                                    v-if="on_send_formation || on_pacth_formation || on_delete_formation"
+                                    class="btn-standard --md --btn-large">
+                                    <div class="change_loader">
+                                        <div class="dot-loader"></div>
+                                        <div class="dot-loader"></div>
+                                        <div class="dot-loader"></div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal certification-->
+    <div class="modal dash-modal fade" id="certification" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog --max-width modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Certifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form action="" class="form-contact-freelance row">
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>Certification suivie <span>*</span></label>
+                                <input :class="status($v.certification.libelle)"
+                                    v-model="$v.certification.libelle.$model" type="text" class="form--group__input">
+                                <div class="error" v-if="!$v.certification.libelle.required">Certification suivie is
+                                    required.</div>
+                                <div class="error" v-if="!$v.certification.libelle.minLength">Certification suivie must
+                                    have at least ${ $v.certification.libelle.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>Organisation de certification <span>*</span></label>
+                                <input :class="status($v.certification.organismemail)"
+                                    v-model="$v.certification.organismemail.$model" type="text"
+                                    class="form--group__input">
+                                <div class="error" v-if="!$v.certification.organismemail.required">Organisation de
+                                    certification is required.</div>
+                                <div class="error" v-if="!$v.certification.organismemail.minLength">Organisation de
+                                    certification must have at least ${
+                                    $v.certification.organismemail.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label for="#">Année d'obtention <span>*</span></label>
+                                <input :class="status($v.certification.annee)" v-model="$v.certification.annee.$model"
+                                    type="date" class="form--group__input">
+                                <div class="error" v-if="!$v.certification.annee.required">Année d'obtention is
+                                    required.</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form--group">
+                                <label for="#">Indiiquer le contenu de la certification</label>
+                                <textarea :class="status($v.certification.description)"
+                                    v-model.trim="$v.certification.description.$model"
+                                    class="form--group__textarea"></textarea>
+                                <div class="error" v-if="!$v.certification.description.required">Description is
+                                    required.</div>
+                                <div class="error" v-if="!$v.certification.description.minLength">Description must have
+                                    at least ${$v.certification.description.$params.minLength.min } letters.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form--group">
+                                <label>lien de certification <span>*</span></label>
+                                <input :class="status($v.certification.lien)"
+                                    v-model.trim="$v.certification.lien.$model" type="url" class="form--group__input">
+                                <div class="error" v-if="!$v.certification.lien.required">Lien de certification is
+                                    required.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form--group">
+                                <label for="#">Compétences mises en oeuvre pendant cette mission</label>
+                                <div class="box-tags">
+                                    <vue-tags-input :tags="certificate_tags" v-model="tag" :disabled="!!editingTag"
+                                        :add-only-from-autocomplete="true" :autocomplete-items="taglistItems"
+                                        :allow-edit-tags="true" @before-editing-tag="editTag"
+                                        @tags-changed="newTags => certificate_tags = newTags" class="input" placeholder="Ajouter vos compétences">
+                                    </vue-tags-input>
+
+                                    <div class="edit-tag-area" v-if="editingTag">
+                                        <input type="text" v-model="editingTag.text">
+                                        <input type="text" v-model="editingTag.categorie">
+                                        <button type="button" @click="setTag(tagBeforeEditing)">cancel</button>
+                                        <button type="button" @click="setTag(editingTag)">save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div style="text-align: right;">
+                                <button type="button" v-if="!display_patch && !on_send_certification"
+                                    class="btn-standard" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" v-if="display_patch && !on_patch_certification"
+                                    class="btn-standard" data-bs-dismiss="modal">Annuler</button>
+
+                                <button V-if="$v.validationCertificationGroup.$invalid && !display_patch" type="button"
+                                    class="btn-standard btn-disable --md" disabled>Enregistrer</button>
+
+                                <button
+                                    V-if="!$v.validationCertificationGroup.$invalid && !display_patch && !on_send_certification"
+                                    type="button" v-on:click="send_certificate"
+                                    class="btn-standard --md">Enregistrer</button>
+
+                                <button v-if="display_patch && !on_delete_certification"
+                                    v-on:click="delete_certification" type="button"
+                                    class="btn-standard">Supprimer</button>
+
+                                <button
+                                    v-if="!$v.validationCertificationGroup.$invalid && display_patch && !on_patch_certification"
+                                    type="button" v-on:click="patch_certification"
+                                    class="btn-standard --md">Modifier</button>
+
+                                <button V-if="$v.validationCertificationGroup.$invalid && display_patch" type="button"
+                                    class="btn-standard btn-disable --md" disabled>Modifier</button>
+
+                                <button type="button"
+                                    v-if="on_send_certification || on_patch_certification || on_delete_certification"
+                                    class="btn-standard --md --btn-large">
+                                    <div class="change_loader">
+                                        <div class="dot-loader"></div>
+                                        <div class="dot-loader"></div>
+                                        <div class="dot-loader"></div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}
+
+{% block js %}
+
+{% include 'base/vue/developer/profile.html' %}
+{% endblock js %}

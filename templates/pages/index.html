@@ -1,6 +1,7 @@
 {% extends 'base/home_base.html' %}
 {% load static %}
 {% block pagecss %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"> 
 <style>
 	.lds-ring {
 		display: inline-block;
@@ -57,9 +58,9 @@
 					</div>
 					<div class="col-lg-6 d-flex">
 						<div class="input-group">
-							<input type="text" class="form-control" placeholder="Medicaments" aria-label="Recipient's username">
+							<input type="text" class="form-control" v-model="search" placeholder="Medicaments" aria-label="Recipient's username">
 							<div class="input-group-append">
-								<button class="btn gradient"><i class="fa fa-search m-r10"></i>Rechercher</button>
+								<button class="btn gradient" v-on:click="search_medoc_by_name"><i class="fa fa-search m-r10"></i>Rechercher</button>
 							</div>
 						</div>
 					</div>
@@ -72,12 +73,19 @@
             <div class="container">
 				<div class="row">
 					<div class="col-xl-12 col-lg-12 col-md-12">
+						<div class="business-profile-settings m-b30">
+							<h3 class="title-head clearfix">
+								<button type="button" data-toggle="modal" data-target="#writeReviews" class="btn blue gradient">Ajouter Médicament</button>
+							</h3>
+						</div>
 						<div class="planner-box m-b30">
 							<div class="content-box">
+								
 								<div class="planner-category">
 									<h3 class="category-title">Liste des Medicaments</h3>
 								</div>
 								<div class="lds-ring" v-if='data_loader'><div></div><div></div><div></div><div></div></div>
+								<div class="alert alert-warning" v-if='is_search'><a href="#" class="close ti-close" data-dismiss="alert" aria-label="close"></a> <strong>Recherche : ${search}</strong> ${medicaments.length} Résultats Trouves</div>
 								<div class="tab-content" id="myTabContent" v-if='!data_loader'>
 									<div class="planner-shortlist-bx tab-pane fade show active" id="Shortlisted" role="tabpanel" aria-labelledby="home-tab">
 										<ul>
@@ -101,20 +109,131 @@
 			</div>
 		</div>
         <!-- contact area end -->
+		<div class="modal fade add-guest write-reviews planner-modal-bx" id="writeReviews" tabindex="-1" role="dialog" aria-labelledby="writeReviews" aria-hidden="true">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<h2 class="modal-title text-center">Nouveau Medicament</h2>
+					<form>
+						<div class="white-bx p-tb30">
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text"  v-model="add_medoc.code" class="form-control" placeholder="CODE">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" v-model="add_medoc.nom" class="form-control" placeholder="NOM">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.dci1" placeholder="DCI1">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control"  v-model="add_medoc.dosage1" placeholder="DOSAGE 1">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.unite_dosage1" placeholder="UNITE DOSAGE ">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.forme" placeholder="FORME">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control"  v-model="add_medoc.presentation" placeholder="PRESENTATION">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.ppv" placeholder="PPV">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.prix_br" placeholder="PRIX BRUTE">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.principe_genetique" placeholder="PRINCIPE GENETIQUE">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.ph" placeholder="PH">
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<input type="text" class="form-control" v-model="add_medoc.taux_remboursement" placeholder="TAUX REMBOUSERMENT">
+									</div>
+								</div>
+								<div class="col-md-12 text-center">
+									<button class="btn green gradient">Ajouter</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
     </div>
+
+	
 {% endblock content %}
+
 {% block pagejs %}
+<script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/validators.min.js"></script>
 <script src="https://unpkg.com/vue@2"></script>
 <script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
 <script>
-    new Vue({
+	Vue.use(window.vuelidate.default)
+    const { required, minLength, email, sameAs, maxStartDate } = window.validators;
+	var app = new Vue({
         el: '#App',
         data: {
 			base_url: window.location.protocol + "//" + window.location.host + "/",
 			data_loader : true, 
 			
 			//data
-			medicaments : [], 
+			medicaments : [],
+			search : '',
+			is_search:false,
+
+			//add medoc
+
+			on_send_medoc: false,
+			
+			add_medoc : {
+				"code":"",
+				"nom":"",
+				"dci1":"",
+				"dosage1":"",
+				"unite_dosage1":"",
+				"forme":"",
+				"presentation":"",
+				"ppv":"",
+				"ph":"",
+				"prix_br":"",
+				"principe_genetique":"",
+				"taux_remboursement":"",
+			}
            
         },
         delimiters: ["${", "}"],
@@ -130,9 +249,22 @@
                     .then(response => {
                         this.medicaments = response.data.results
                         this.data_loader = false;
+						
                     })
                     .catch((err) => { console.log(err); });
             },
+			
+			search_medoc_by_name: function(){
+				axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+				axios.get("/api/v1/medicaments/?nom=" + this.search)
+                    .then(response => {
+                        this.medicaments = response.data.results
+                        this.data_loader = false;
+						this.is_search = true;
+                    })
+                    .catch((err) => { console.log(err); });
+			}
         },
     })
 </script>
