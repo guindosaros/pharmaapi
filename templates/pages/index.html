@@ -1,10 +1,47 @@
 {% extends 'base/home_base.html' %}
 {% load static %}
 {% block pagecss %}
+<style>
+	.lds-ring {
+		display: inline-block;
+		position: relative;
+		width: 80px;
+		height: 80px;
+	  }
+	  .lds-ring div {
+		box-sizing: border-box;
+		display: block;
+		position: absolute;
+		width: 64px;
+		height: 64px;
+		margin: 8px;
+		border: 8px solid #fcf;
+		border-radius: 50%;
+		animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+		border-color: #fcf transparent transparent transparent;
+	  }
+	  .lds-ring div:nth-child(1) {
+		animation-delay: -0.45s;
+	  }
+	  .lds-ring div:nth-child(2) {
+		animation-delay: -0.3s;
+	  }
+	  .lds-ring div:nth-child(3) {
+		animation-delay: -0.15s;
+	  }
+	  @keyframes lds-ring {
+		0% {
+		  transform: rotate(0deg);
+		}
+		100% {
+		  transform: rotate(360deg);
+		}
+	  }
 
+</style>
 {% endblock pagecss %}
 {% block content %}
-    <div class="page-content bg-white">
+    <div class="page-content bg-white" id='App'>
 		<div class="section-full bg-white plan-tools-bx">
 			<div class="container">
 			
@@ -40,25 +77,17 @@
 								<div class="planner-category">
 									<h3 class="category-title">Liste des Medicaments</h3>
 								</div>
-								<div class="tab-content" id="myTabContent">
+								<div class="lds-ring" v-if='data_loader'><div></div><div></div><div></div><div></div></div>
+								<div class="tab-content" id="myTabContent" v-if='!data_loader'>
 									<div class="planner-shortlist-bx tab-pane fade show active" id="Shortlisted" role="tabpanel" aria-labelledby="home-tab">
 										<ul>
-											<li>
-												<a href="javascript:void(0);" class="rightopen shortlist shortlist-add">
+											<li v-for="item in medicaments" :key="item.code">
+												<a href="#" class="rightopen shortlist shortlist-add">
 													<div class="add-info">
-														<h6 class="shortlist-name">Your Venue</h6>
-														<p>5 Saved</p>
+														<h6 class="shortlist-name">${item.nom}</h6>
+														<p>${item.ppv} FCFA</p>
 													</div>
-													<span class="shortlist-click">Get started <i class="fa fa-angle-right"></i></span>
-												</a>
-											</li>
-											<li>
-												<a href="javascript:void(0);" class="rightopen shortlist shortlist-add">
-													<div class="add-info">
-														<h6 class="shortlist-name">Your Florist</h6>
-														<p>5 Saved</p>
-													</div>
-													<span class="shortlist-click">Get started <i class="fa fa-angle-right"></i></span>
+													<span class="shortlist-click">Voir-detail<i class="fa fa-angle-right"></i></span>
 												</a>
 											</li>
 										</ul>
@@ -75,5 +104,37 @@
     </div>
 {% endblock content %}
 {% block pagejs %}
+<script src="https://unpkg.com/vue@2"></script>
+<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+<script>
+    new Vue({
+        el: '#App',
+        data: {
+			base_url: window.location.protocol + "//" + window.location.host + "/",
+			data_loader : true, 
+			
+			//data
+			medicaments : [], 
+           
+        },
+        delimiters: ["${", "}"],
+		mounted() {
+			this.get_all_medoc_page()
+
+		},
+        methods: {
+			get_all_medoc_page: function () {
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.get("/api/v1/medicaments/")
+                    .then(response => {
+                        this.medicaments = response.data.results
+                        this.data_loader = false;
+                    })
+                    .catch((err) => { console.log(err); });
+            },
+        },
+    })
+</script>
 
 {% endblock pagejs %}

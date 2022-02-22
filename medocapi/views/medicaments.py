@@ -1,11 +1,11 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet
 from drf_yasg.utils import swagger_auto_schema
 
 
 from medocapi import serializers, models, schema, filters
 
 
-class MedicamentViewSet(ReadOnlyModelViewSet):
+class MedicamentViewSet(ModelViewSet):
 
     serializer_class = serializers.MedicamentSerializer
     detail_serializer_class = serializers.DetailMedicamentsSerializer
