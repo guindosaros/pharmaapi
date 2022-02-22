@@ -12,7 +12,8 @@ __pycache__/
 
 # Media files development
 media/
-
+media_cdn/
+data.json
 # database
 db.sqlite3
 

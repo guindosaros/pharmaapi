@@ -1,0 +1,37 @@
+/*=========================
+	All css
+==========================*/
+@import url("../plugins/bootstrap/css/bootstrap.min.css");
+@import url("../plugins/fontawesome/css/font-awesome.min.css");
+@import url("../plugins/line-awesome/css/line-awesome.min.css");
+@import url("../plugins/flaticon/flaticon.css");
+@import url("../plugins/themify/themify-icons.css");
+@import url("../plugins/owl-carousel/owl.carousel.css");
+@import url("../plugins/bootstrap-select/bootstrap-select.min.css");
+@import url("../plugins/magnific-popup/magnific-popup.css");
+@import url("../plugins/scroll/scrollbar.css");
+@import url("../plugins/animate/animate.css");
+@import url("../plugins/lightgallery/css/lightgallery.min.css");
+@import url("../plugins/rangeslider/rangeslider.css");
+@import url("../plugins/switcher/switcher.css");
+
+/*=========================
+	All css
+==========================*/
+@import url('https://fonts.googleapis.com/css?family=Hind:300,400,500,600,700|Lato:100,100i,300,300i,400,400i,700,700i,900,900i|Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i|Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i|PT+Serif:400,400i,700,700i|Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i|Roboto+Slab:100,300,400,700|Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i|Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Rubik:300,300i,400,400i,500,500i,700,700i,900,900i');
+
+@import url('https://fonts.googleapis.com/css?family=Petit+Formal+Script&display=swap&subset=latin-ext');
+
+/*
+font-family: 'Hind', sans-serif;
+font-family: 'Montserrat', sans-serif;
+font-family: 'Poppins', sans-serif;
+font-family: 'Nunito', sans-serif;
+font-family: 'Roboto', sans-serif;
+font-family: 'Roboto Slab', serif;
+font-family: 'PT Serif', serif;
+font-family: 'Open Sans', sans-serif;
+font-family: 'Lato', sans-serif;
+font-family: 'Raleway', sans-serif;
+font-family: 'Rubik', sans-serif;
+*/

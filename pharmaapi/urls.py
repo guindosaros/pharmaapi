@@ -42,7 +42,10 @@ urlpatterns = [
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('', include_docs_urls(title='Pharma MEDOC API', public=True)),
+    path('api-docs', include_docs_urls(title='Pharma MEDOC API', public=True)),
     path("admin/", admin.site.urls),
-    path(f"{BASE_PATH}/", include('medocapi.urls')),
+    path("", include('medocapi.urls')),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
