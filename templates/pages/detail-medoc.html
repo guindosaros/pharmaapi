@@ -77,14 +77,16 @@
                             </div>
                             <small class="small-bx">le detail complet d'un medicaments et ses compositions </small>
                             <div class="lds-ring" v-if='data_loader'>
-								<div></div>
-								<div></div>
-								<div></div>
-								<div></div>
-							</div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
                             <ul class="vender-profile-list" v-if='!data_loader'>
-                                <li><a data-toggle="modal" data-target="#edit-details" class="btn edit"
-                                href="javascript:;">Modifier<i class="fa fa-pencil"></i></a></li>
+                                <li><button data-toggle="modal" v-on:click="init_medoc_data" type="button"
+                                        data-target="#edit-details" class="btn edit" href="javascript:;"> Modifier<i
+                                            class="fa fa-pencil"></i></button>
+                                </li>
                                 <li><strong>Code:</strong> ${medicament.code}</li>
                                 <li><strong>Nom:</strong> ${medicament.nom}</li>
                                 <li><strong>Dci 1:</strong> ${medicament.dci1}</li>
@@ -104,7 +106,120 @@
             </div>
         </div>
     </div>
+
+    <!-- UPDATE MODAL -->
+    <div class="modal fade add-guest write-reviews planner-modal-bx" id="edit-details" tabindex="-1" role="dialog"
+        aria-labelledby="writeReviews" aria-hidden="true">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <h2 class="modal-title text-center">Modifier Medicaments</h2>
+                <form>
+                    <div class="white-bx p-tb30">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" v-model.trim="$v.update_medoc.code.$model"
+                                        :class="status($v.update_medoc.code)" class="form-control" placeholder="CODE">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" v-model.trim="$v.update_medoc.nom.$model" class="form-control"
+                                        :class="status($v.update_medoc.nom)" placeholder="NOM">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" v-model.trim="$v.update_medoc.dci1.$model"
+                                        :class="status($v.update_medoc.dci1)" placeholder="DCI1">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        v-model.trim="$v.update_medoc.dosage1.$model"
+                                        :class="status($v.update_medoc.dosage1)" placeholder="DOSAGE 1">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        v-model.trim="$v.update_medoc.unite_dosage1.$model"
+                                        :class="status($v.update_medoc.unite_dosage1)" placeholder="UNITE DOSAGE ">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" v-model.trim="$v.update_medoc.forme.$model"
+                                        :class="status($v.update_medoc.forme)" placeholder="FORME">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        v-model.trim="$v.update_medoc.presentation.$model"
+                                        :class="status($v.update_medoc.presentation)" placeholder="PRESENTATION">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" v-model.trim="$v.update_medoc.ppv.$model"
+                                        :class="status($v.update_medoc.ppv)" placeholder="PPV">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        v-model.trim="$v.update_medoc.prix_br.$model"
+                                        :class="status($v.update_medoc.prix_br)" placeholder="PRIX BRUTE">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        v-model.trim="$v.update_medoc.principe_genetique.$model"
+                                        :class="status($v.update_medoc.principe_genetique)"
+                                        placeholder="PRINCIPE GENETIQUE">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" v-model.trim="$v.update_medoc.ph.$model"
+                                        :class="status($v.update_medoc.ph)" placeholder="PH">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        v-model.trim="$v.update_medoc.taux_remboursement.$model"
+                                        :class="status($v.update_medoc.taux_remboursement)"
+                                        placeholder="TAUX REMBOUSERMENT">
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <div class="lds-ring" v-if="send_update">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <button type='button' class="btn green gradient"
+                                    V-if="!$v.validationMedocGroup.$invalid  && !send_update"
+                                    v-on:click="patch_medicament">Modifier</button>
+                                <button class="btn green gradient" disabled
+                                    V-if="$v.validationMedocGroup.$invalid">Modifier</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
 {% endblock content %}
 {% block pagejs %}
 <script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js"></script>
@@ -114,129 +229,159 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
-	Vue.use(window.vuelidate.default)
-	const { required, minLength, email, sameAs, maxStartDate } = window.validators;
-	var app = new Vue({
-		el: '#detail',
-		data: {
-			base_url: window.location.protocol + "//" + window.location.host + "/",
-			data_loader: true,
+    Vue.use(window.vuelidate.default)
+    const { required, minLength, email, sameAs, maxStartDate } = window.validators;
+    var app = new Vue({
+        el: '#detail',
+        data: {
+            base_url: window.location.protocol + "//" + window.location.host + "/",
+            data_loader: true,
             code: "{{code}}",
+            send_update: false,
+            pach_medoc : false,
+            //data
+            medicaments: {},
 
-			//data
-			medicaments: {},
-			
-			update_medoc: {
-				"code": "",
-				"nom": "",
-				"dci1": "",
-				"dosage1": "",
-				"unite_dosage1": "",
-				"forme": "",
-				"presentation": "",
-				"ppv": "",
-				"ph": "",
-				"prix_br": "",
-				"principe_genetique": "",
-				"taux_remboursement": "",
-			}
+            update_medoc: {
+                "code": "",
+                "nom": "",
+                "dci1": "",
+                "dosage1": "",
+                "unite_dosage1": "",
+                "forme": "",
+                "presentation": "",
+                "ppv": "",
+                "ph": "",
+                "prix_br": "",
+                "principe_genetique": "",
+                "taux_remboursement": "",
+            }
 
-		},
-		validations: {
-			update_medoc: {
-				code: {
-					minLength: minLength(3),
-					required,
-				},
-				nom: {
-					minLength: minLength(3),
-					required,
-				},
-				dci1: {
-					minLength: minLength(3),
-					required,
-				},
-				dosage1: {
-					minLength: minLength(3),
-					required,
-				},
-				unite_dosage1: {
-					minLength: minLength(1),
-					required,
-				},
-				forme: {
-					minLength: minLength(3),
-					required,
-				},
-				presentation: {
-					minLength: minLength(3),
-					required,
-				},
-				ppv: {
-					minLength: minLength(3),
-					required,
-				},
-				ph: {
-					minLength: minLength(3),
-					required,
-				},
-				prix_br: {
-					minLength: minLength(3),
-					required,
-				},
-				principe_genetique: {
-					minLength: minLength(3),
-					required,
-				},
-				taux_remboursement: {
-					minLength: minLength(3),
-					required,
-				},
-			},
-			validationMedocGroup: ['update_medoc.code', 'update_medoc.nom', 'update_medoc.dci1', 'update_medoc.dosage1', 'update_medoc.forme', 'update_medoc.presentation', 'update_medoc.ppv', 'update_medoc.ph', 'update_medoc.prix_br', 'update_medoc.principe_genetique', 'update_medoc.taux_remboursement']
-		},
-		delimiters: ["${", "}"],
-		mounted() {
-			this.get_detail_medoc()
+        },
+        validations: {
+            update_medoc: {
+                code: {
+                    minLength: minLength(3),
+                    required,
+                },
+                nom: {
+                    minLength: minLength(3),
+                    required,
+                },
+                dci1: {
+                    minLength: minLength(1),
+                    required,
+                },
+                dosage1: {
+                    minLength: minLength(1),
+                    required,
+                },
+                unite_dosage1: {
+                    minLength: minLength(1),
+                    required,
+                },
+                forme: {
+                    minLength: minLength(3),
+                    required,
+                },
+                presentation: {
+                    minLength: minLength(3),
+                    required,
+                },
+                ppv: {
+                    minLength: minLength(2),
+                    required,
+                },
+                ph: {
+                    minLength: minLength(3),
+                    required,
+                },
+                prix_br: {
+                    minLength: minLength(3),
+                    required,
+                },
+                principe_genetique: {
+                    minLength: minLength(1),
+                    required,
+                },
+                taux_remboursement: {
+                    minLength: minLength(1),
+                    required,
+                },
+            },
+            validationMedocGroup: ['update_medoc.code', 'update_medoc.nom', 'update_medoc.dci1', 'update_medoc.dosage1', 'update_medoc.forme', 'update_medoc.presentation', 'update_medoc.ppv', 'update_medoc.ph', 'update_medoc.prix_br', 'update_medoc.principe_genetique', 'update_medoc.taux_remboursement']
+        },
+        delimiters: ["${", "}"],
+        mounted() {
+            this.get_detail_medoc()
 
-		},
-		methods: {
-			status(validation) {
-				return {
-					error: validation.$error,
-					dirty: validation.$dirty
-				}
-			},
+        },
+        methods: {
+            status(validation) {
+                return {
+                    error: validation.$error,
+                    dirty: validation.$dirty
+                }
+            },
 
             get_detail_medoc: function () {
-				axios.defaults.xsrfCookieName = 'csrftoken';
-				axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-				axios.get("/api/v1/medicaments/" + this.code)
-					.then(response => {
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.get("/api/v1/medicaments/" + this.code)
+                    .then(response => {
                         console.log(response.data)
-						this.medicament = response.data
-						this.data_loader = false;
+                        this.medicament = response.data
+                        this.data_loader = false;
 
-					})
-					.catch((err) => { console.log(err); });
-			},
-					
-			reset_data: function () {
-				    this.update_medoc.code = "",
-					this.update_medoc.nom = "",
-					this.update_medoc.dci1 = "",
-					this.update_medoc.dosage1 = "",
-					this.update_medoc.unite_dosage1 = "",
-					this.update_medoc.forme = "",
-					this.update_medoc.presentation = "",
-					this.update_medoc.ppv = "",
-					this.update_medoc.ph = "",
-					this.update_medoc.prix_br = "",
-					this.update_medoc.principe_genetique = "",
-					this.update_medoc.taux_remboursement = ""
-			},
-		},
-	})
+                    })
+                    .catch((err) => { console.log(err); });
+            },
+
+            patch_medicament: function () {
+                this.send_update = true
+                if (this.update_medoc.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        html: '<h4>Remplie correctements les champs</h4>',
+                    });
+                } else {
+                    const json_data = this.update_medoc
+                    axios.defaults.xsrfCookieName = 'csrftoken';
+                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                    axios.patch("/api/v1/medicaments/" + this.code + "/", json_data)
+                        .then(response => {
+                            this.send_update = false;
+                            $('#edit-details').modal('hide');
+                            toastr.success("Mise à jour effectué avec succès!", "Mise à jour ok!", { timeOut: 10000 })
+                            this.get_detail_medoc();
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            this.pach_medoc = false;
+                            toastr.error("Impossible d'effectuer la modification, Merci de verifier que les champs saisi son correcte", "Erreure de modification!", { timeOut: 10000 })
+                        });
+                }
+            },
+
+            init_medoc_data: function () {
+                this.update_medoc = {
+                    'code': this.medicament.code,
+                    "nom": this.medicament.nom,
+                    "dci1": this.medicament.dci1,
+                    "dosage1": this.medicament.dosage1,
+                    "unite_dosage1": this.medicament.unite_dosage1,
+                    "forme": this.medicament.forme,
+                    "presentation": this.medicament.presentation,
+                    "ppv": this.medicament.ppv,
+                    "ph": this.medicament.ph,
+                    "prix_br": this.medicament.prix_br,
+                    "principe_genetique": this.medicament.principe_genetique,
+                    "taux_remboursement": this.medicament.taux_remboursement,
+                }
+            }
+
+        },
+    })
 </script>
 
 {% endblock pagejs %}
