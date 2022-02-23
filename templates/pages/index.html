@@ -1,15 +1,34 @@
 {% extends 'base/home_base.html' %}
 {% load static %}
 {% block pagecss %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"> 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <style>
+	.dirty {
+		border-color: #5A5 !important;
+		background: #EFE !important;
+	}
+
+	.dirty:focus {
+		outline-color: #8E8 !important;
+	}
+
+	.error {
+		border-color: red !important;
+		background: #FDD !important;
+	}
+
+	.error:focus {
+		outline-color: #F99 !important;
+	}
+
 	.lds-ring {
 		display: inline-block;
 		position: relative;
 		width: 80px;
 		height: 80px;
-	  }
-	  .lds-ring div {
+	}
+
+	.lds-ring div {
 		box-sizing: border-box;
 		display: block;
 		position: absolute;
@@ -20,177 +39,222 @@
 		border-radius: 50%;
 		animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 		border-color: #fcf transparent transparent transparent;
-	  }
-	  .lds-ring div:nth-child(1) {
-		animation-delay: -0.45s;
-	  }
-	  .lds-ring div:nth-child(2) {
-		animation-delay: -0.3s;
-	  }
-	  .lds-ring div:nth-child(3) {
-		animation-delay: -0.15s;
-	  }
-	  @keyframes lds-ring {
-		0% {
-		  transform: rotate(0deg);
-		}
-		100% {
-		  transform: rotate(360deg);
-		}
-	  }
+	}
 
+	.lds-ring div:nth-child(1) {
+		animation-delay: -0.45s;
+	}
+
+	.lds-ring div:nth-child(2) {
+		animation-delay: -0.3s;
+	}
+
+	.lds-ring div:nth-child(3) {
+		animation-delay: -0.15s;
+	}
+
+	@keyframes lds-ring {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
 </style>
 {% endblock pagecss %}
 {% block content %}
-    <div class="page-content bg-white" id='App'>
-		<div class="section-full bg-white plan-tools-bx">
-			<div class="container">
-			
-			</div>
-		</div>
-		<!-- Manager Tools End -->
-		<!-- Planner advice -->
-		<div class="wedding-filter-search wedding-filter-advice">
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-6 d-flex">
-						<h2 class="title">Online Pharmacie</h2>
-					</div>
-					<div class="col-lg-6 d-flex">
-						<div class="input-group">
-							<input type="text" class="form-control" v-model="search" placeholder="Medicaments" aria-label="Recipient's username">
-							<div class="input-group-append">
-								<button class="btn gradient" v-on:click="search_medoc_by_name"><i class="fa fa-search m-r10"></i>Rechercher</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- Planner advice End -->
-        <!-- contact area -->
-        <div class="section-full content-inner bg-gray">
-            <div class="container">
-				<div class="row">
-					<div class="col-xl-12 col-lg-12 col-md-12">
-						<div class="business-profile-settings m-b30">
-							<h3 class="title-head clearfix">
-								<button type="button" data-toggle="modal" data-target="#writeReviews" class="btn blue gradient">Ajouter Médicament</button>
-							</h3>
-						</div>
-						<div class="planner-box m-b30">
-							<div class="content-box">
-								
-								<div class="planner-category">
-									<h3 class="category-title">Liste des Medicaments</h3>
-								</div>
-								<div class="lds-ring" v-if='data_loader'><div></div><div></div><div></div><div></div></div>
-								<div class="alert alert-warning" v-if='is_search'><a href="#" class="close ti-close" data-dismiss="alert" aria-label="close"></a> <strong>Recherche : ${search}</strong> ${medicaments.length} Résultats Trouves</div>
-								<div class="tab-content" id="myTabContent" v-if='!data_loader'>
-									<div class="planner-shortlist-bx tab-pane fade show active" id="Shortlisted" role="tabpanel" aria-labelledby="home-tab">
-										<ul>
-											<li v-for="item in medicaments" :key="item.code">
-												<a href="#" class="rightopen shortlist shortlist-add">
-													<div class="add-info">
-														<h6 class="shortlist-name">${item.nom}</h6>
-														<p>${item.ppv} FCFA</p>
-													</div>
-													<span class="shortlist-click">Voir-detail<i class="fa fa-angle-right"></i></span>
-												</a>
-											</li>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</div>
-						
-					</div>
-				</div>
-			</div>
-		</div>
-        <!-- contact area end -->
-		<div class="modal fade add-guest write-reviews planner-modal-bx" id="writeReviews" tabindex="-1" role="dialog" aria-labelledby="writeReviews" aria-hidden="true">
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<h2 class="modal-title text-center">Nouveau Medicament</h2>
-					<form>
-						<div class="white-bx p-tb30">
-							<div class="row">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text"  v-model="add_medoc.code" class="form-control" placeholder="CODE">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" v-model="add_medoc.nom" class="form-control" placeholder="NOM">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.dci1" placeholder="DCI1">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control"  v-model="add_medoc.dosage1" placeholder="DOSAGE 1">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.unite_dosage1" placeholder="UNITE DOSAGE ">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.forme" placeholder="FORME">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control"  v-model="add_medoc.presentation" placeholder="PRESENTATION">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.ppv" placeholder="PPV">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.prix_br" placeholder="PRIX BRUTE">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.principe_genetique" placeholder="PRINCIPE GENETIQUE">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.ph" placeholder="PH">
-									</div>
-								</div>
-								<div class="col-lg-6">
-									<div class="form-group">
-										<input type="text" class="form-control" v-model="add_medoc.taux_remboursement" placeholder="TAUX REMBOUSERMENT">
-									</div>
-								</div>
-								<div class="col-md-12 text-center">
-									<button class="btn green gradient">Ajouter</button>
-								</div>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-    </div>
+<div class="page-content bg-white" id='App'>
+	<div class="section-full bg-white plan-tools-bx">
+		<div class="container">
 
-	
+		</div>
+	</div>
+	<!-- Manager Tools End -->
+	<!-- Planner advice -->
+	<div class="wedding-filter-search wedding-filter-advice">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 d-flex">
+					<h2 class="title">Online Pharmacie</h2>
+				</div>
+				<div class="col-lg-6 d-flex">
+					<div class="input-group">
+						<input type="text" class="form-control" v-model="search" placeholder="Medicaments"
+							aria-label="Recipient's username">
+						<div class="input-group-append">
+							<button class="btn gradient" type='button' v-on:click="search_medoc_by_name"><i
+									class="fa fa-search m-r10"></i>Rechercher</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Planner advice End -->
+	<!-- contact area -->
+	<div class="section-full content-inner bg-gray">
+		<div class="container">
+			<div class="row">
+				<div class="col-xl-12 col-lg-12 col-md-12">
+					<div class="business-profile-settings m-b30">
+						<h3 class="title-head clearfix">
+							<button type="button" data-toggle="modal" data-target="#writeReviews"
+								class="btn blue gradient">Ajouter Médicament</button>
+						</h3>
+					</div>
+					<div class="planner-box m-b30">
+						<div class="content-box">
+
+							<div class="planner-category">
+								<h3 class="category-title">Liste des Medicaments</h3>
+							</div>
+							<div class="lds-ring" v-if='data_loader'>
+								<div></div>
+								<div></div>
+								<div></div>
+								<div></div>
+							</div>
+							<div class="alert alert-warning" v-if='is_search'><a href="#" class="close ti-close"
+									data-dismiss="alert" aria-label="close"></a> <strong>Recherche : ${search}</strong>
+								${medicaments.length} Résultats Trouves</div>
+							<div class="tab-content" id="myTabContent" v-if='!data_loader'>
+								<div class="planner-shortlist-bx tab-pane fade show active" id="Shortlisted"
+									role="tabpanel" aria-labelledby="home-tab">
+									<ul>
+										<li v-for="item in medicaments" :key="item.code">
+											<a :href=``+`${base_url}`+`detail-medoc/`+`${item.code}`+`` class="rightopen shortlist shortlist-add">
+												<div class="add-info">
+													<h6 class="shortlist-name">${item.nom}</h6>
+													<p>${item.ppv} FCFA</p>
+												</div>
+												<span class="shortlist-click">Voir-detail<i
+														class="fa fa-angle-right"></i></span>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- contact area end -->
+	<div class="modal fade add-guest write-reviews planner-modal-bx" id="writeReviews" tabindex="-1" role="dialog"
+		aria-labelledby="writeReviews" aria-hidden="true">
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<h2 class="modal-title text-center">Nouveau Medicament</h2>
+				<form>
+					<div class="white-bx p-tb30">
+						<div class="row">
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" v-model.trim="$v.add_medoc.code.$model"
+										:class="status($v.add_medoc.code)" class="form-control" placeholder="CODE">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" v-model.trim="$v.add_medoc.nom.$model" class="form-control"
+										:class="status($v.add_medoc.nom)" placeholder="NOM">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control" v-model.trim="$v.add_medoc.dci1.$model"
+										:class="status($v.add_medoc.dci1)" placeholder="DCI1">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control" v-model.trim="$v.add_medoc.dosage1.$model"
+										:class="status($v.add_medoc.dosage1)" placeholder="DOSAGE 1">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control"
+										v-model.trim="$v.add_medoc.unite_dosage1.$model"
+										:class="status($v.add_medoc.unite_dosage1)" placeholder="UNITE DOSAGE ">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control" v-model.trim="$v.add_medoc.forme.$model"
+										:class="status($v.add_medoc.forme)" placeholder="FORME">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control"
+										v-model.trim="$v.add_medoc.presentation.$model"
+										:class="status($v.add_medoc.presentation)" placeholder="PRESENTATION">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control" v-model.trim="$v.add_medoc.ppv.$model"
+										:class="status($v.add_medoc.ppv)" placeholder="PPV">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control" v-model.trim="$v.add_medoc.prix_br.$model"
+										:class="status($v.add_medoc.prix_br)" placeholder="PRIX BRUTE">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control"
+										v-model.trim="$v.add_medoc.principe_genetique.$model"
+										:class="status($v.add_medoc.principe_genetique)"
+										placeholder="PRINCIPE GENETIQUE">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control" v-model.trim="$v.add_medoc.ph.$model"
+										:class="status($v.add_medoc.ph)" placeholder="PH">
+								</div>
+							</div>
+							<div class="col-lg-6">
+								<div class="form-group">
+									<input type="text" class="form-control"
+										v-model.trim="$v.add_medoc.taux_remboursement.$model"
+										:class="status($v.add_medoc.taux_remboursement)"
+										placeholder="TAUX REMBOUSERMENT">
+								</div>
+							</div>
+							<div class="col-md-12 text-center">
+								<div class="lds-ring" v-if="on_send_medoc">
+									<div></div>
+									<div></div>
+									<div></div>
+									<div></div>
+								</div>
+								<button type='button' class="btn green gradient"
+									V-if="!$v.validationMedocGroup.$invalid  && !on_send_medoc"
+									v-on:click="send_medoc">Ajouter</button>
+								<button class="btn green gradient" disabled
+									V-if="$v.validationMedocGroup.$invalid">Ajouter</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 {% endblock content %}
 
 {% block pagejs %}
@@ -204,69 +268,170 @@
 
 <script>
 	Vue.use(window.vuelidate.default)
-    const { required, minLength, email, sameAs, maxStartDate } = window.validators;
+	const { required, minLength, email, sameAs, maxStartDate } = window.validators;
 	var app = new Vue({
-        el: '#App',
-        data: {
+		el: '#App',
+		data: {
 			base_url: window.location.protocol + "//" + window.location.host + "/",
-			data_loader : true, 
-			
+			data_loader: true,
+
 			//data
-			medicaments : [],
-			search : '',
-			is_search:false,
+			medicaments: [],
+			search: '',
+			is_search: false,
 
 			//add medoc
 
 			on_send_medoc: false,
-			
-			add_medoc : {
-				"code":"",
-				"nom":"",
-				"dci1":"",
-				"dosage1":"",
-				"unite_dosage1":"",
-				"forme":"",
-				"presentation":"",
-				"ppv":"",
-				"ph":"",
-				"prix_br":"",
-				"principe_genetique":"",
-				"taux_remboursement":"",
+
+			add_medoc: {
+				"code": "",
+				"nom": "",
+				"dci1": "",
+				"dosage1": "",
+				"unite_dosage1": "",
+				"forme": "",
+				"presentation": "",
+				"ppv": "",
+				"ph": "",
+				"prix_br": "",
+				"principe_genetique": "",
+				"taux_remboursement": "",
 			}
-           
-        },
-        delimiters: ["${", "}"],
+
+		},
+		validations: {
+			add_medoc: {
+				code: {
+					minLength: minLength(3),
+					required,
+				},
+				nom: {
+					minLength: minLength(3),
+					required,
+				},
+				dci1: {
+					minLength: minLength(3),
+					required,
+				},
+				dosage1: {
+					minLength: minLength(3),
+					required,
+				},
+				unite_dosage1: {
+					minLength: minLength(1),
+					required,
+				},
+				forme: {
+					minLength: minLength(3),
+					required,
+				},
+				presentation: {
+					minLength: minLength(3),
+					required,
+				},
+				ppv: {
+					minLength: minLength(3),
+					required,
+				},
+				ph: {
+					minLength: minLength(3),
+					required,
+				},
+				prix_br: {
+					minLength: minLength(3),
+					required,
+				},
+				principe_genetique: {
+					minLength: minLength(3),
+					required,
+				},
+				taux_remboursement: {
+					minLength: minLength(3),
+					required,
+				},
+			},
+			validationMedocGroup: ['add_medoc.code', 'add_medoc.nom', 'add_medoc.dci1', 'add_medoc.dosage1', 'add_medoc.forme', 'add_medoc.presentation', 'add_medoc.ppv', 'add_medoc.ph', 'add_medoc.prix_br', 'add_medoc.principe_genetique', 'add_medoc.taux_remboursement']
+		},
+		delimiters: ["${", "}"],
 		mounted() {
 			this.get_all_medoc_page()
 
 		},
-        methods: {
+		methods: {
+			status(validation) {
+				return {
+					error: validation.$error,
+					dirty: validation.$dirty
+				}
+			},
 			get_all_medoc_page: function () {
-                axios.defaults.xsrfCookieName = 'csrftoken';
-                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-                axios.get("/api/v1/medicaments/")
-                    .then(response => {
-                        this.medicaments = response.data.results
-                        this.data_loader = false;
-						
-                    })
-                    .catch((err) => { console.log(err); });
-            },
-			
-			search_medoc_by_name: function(){
 				axios.defaults.xsrfCookieName = 'csrftoken';
-                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+				axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+				axios.get("/api/v1/medicaments/")
+					.then(response => {
+						this.medicaments = response.data.results
+						this.data_loader = false;
+
+					})
+					.catch((err) => { console.log(err); });
+			},
+
+			search_medoc_by_name: function () {
+				axios.defaults.xsrfCookieName = 'csrftoken';
+				axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 				axios.get("/api/v1/medicaments/?nom=" + this.search)
-                    .then(response => {
-                        this.medicaments = response.data.results
-                        this.data_loader = false;
+					.then(response => {
+						this.medicaments = response.data.results
+						this.data_loader = false;
 						this.is_search = true;
-                    })
-                    .catch((err) => { console.log(err); });
-			}
-        },
-    })
+					})
+					.catch((err) => { console.log(err); });
+			},
+			// Send Data to Api in vue Js
+			send_medoc: function () {
+				if (this.$v.validationMedocGroup.$invalid) {
+					Swal.fire({
+						icon: 'warning',
+						html: '<h4>Veuillez ajoutez des compétences.</h4>',
+					});
+				} else {
+					this.on_send_medoc = true;
+					const json_data = this.add_medoc
+					axios.defaults.xsrfCookieName = 'csrftoken';
+					axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+					axios.post("/api/v1/medicaments/", json_data)
+						.then(response => {
+							this.get_all_medoc_page()
+							this.on_send_medoc = false;
+							$('#writeReviews').modal('hide');
+							toastr.success("Medicaments ajouté avec succès!", "Création ok!", { timeOut: 10000 })
+							this.reset_data()
+
+						})
+						.catch((err) => {
+							console.log(err);
+							this.on_send_medoc = false;
+							toastr.error("Impossible d'ajouter ce medicaments", "Erreure de création!", { timeOut: 10000 })
+						});
+				}
+			},
+			reset_data: function () {
+				    this.add_medoc.code = "",
+					this.add_medocnom = "",
+					this.add_medoc.dci1 = "",
+					this.add_medoc.dosage1 = "",
+					this.add_medoc.unite_dosage1 = "",
+					this.add_medoc.forme = "",
+					this.add_medoc.presentation = "",
+					this.add_medoc.ppv = "",
+					this.add_medoc.ph = "",
+					this.add_medoc.prix_br = "",
+					this.add_medoc.principe_genetique = "",
+					this.add_medoc.taux_remboursement = ""
+			},
+		},
+	})
 </script>
 
 {% endblock pagejs %}
