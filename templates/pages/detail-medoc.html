@@ -70,10 +70,14 @@
         <div class="container">
             <div class="row ">
                 <div class="col-xl-4 col-lg-5 col-md-12">
+                    <div class="add-video-bx">
+                        <a type="button" v-on:click="show_delete_medoc" class="close"><i class="la la-times"></i></a>
+                    </div>
                     <aside class="side-bar listing-side-bar">
                         <div class="venues-sidebar-info">
                             <div class="title-head">
                                 <h5 class="title">Detail d'un medicaments</h5>
+
                             </div>
                             <small class="small-bx">le detail complet d'un medicaments et ses compositions </small>
                             <div class="lds-ring" v-if='data_loader'>
@@ -238,9 +242,11 @@
             data_loader: true,
             code: "{{code}}",
             send_update: false,
-            pach_medoc : false,
+            pach_medoc: false,
+            on_delete_medoc: false,
             //data
-            medicaments: {},
+            medicament: {},
+            redirect: "{% url 'index' %}",
 
             update_medoc: {
                 "code": "",
@@ -329,10 +335,8 @@
                 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
                 axios.get("/api/v1/medicaments/" + this.code)
                     .then(response => {
-                        console.log(response.data)
                         this.medicament = response.data
                         this.data_loader = false;
-
                     })
                     .catch((err) => { console.log(err); });
             },
@@ -350,10 +354,10 @@
                     axios.defaults.xsrfHeaderName = 'X-CSRFToken';
                     axios.patch("/api/v1/medicaments/" + this.code + "/", json_data)
                         .then(response => {
+                            this.get_detail_medoc();
                             this.send_update = false;
                             $('#edit-details').modal('hide');
                             toastr.success("Mise à jour effectué avec succès!", "Mise à jour ok!", { timeOut: 10000 })
-                            this.get_detail_medoc();
                         })
                         .catch((err) => {
                             console.log(err);
@@ -361,6 +365,38 @@
                             toastr.error("Impossible d'effectuer la modification, Merci de verifier que les champs saisi son correcte", "Erreure de modification!", { timeOut: 10000 })
                         });
                 }
+            },
+
+            delette_medicament: function () {
+                this.on_delete_medoc = true;
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.delete("/api/v1/medicaments/" + this.code)
+                    .then(response => {
+                        toastr.success("Medicaments supprimé avec succès!", "Suppression Ok!", { timeOut: 100000 })
+                        window.location.replace(this.redirect)
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_delete_medoc = false;
+                        toastr.error("Impossible de supprimer cet Medicaments", "Erreure de suppression!", { timeOut: 10000 })
+                    });
+            },
+
+            show_delete_medoc: function () {
+                Swal.fire({
+                    title: 'Confirmer suppression ?',
+                    text: "être vous sûre de supprimer ce Medicament !",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2F86A6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Oui'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.delette_medicament()
+                    }
+                })
             },
 
             init_medoc_data: function () {
