@@ -1,4 +1,3 @@
-from black import Mode
 from django.db import models
 
 
