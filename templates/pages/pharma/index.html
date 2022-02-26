@@ -124,7 +124,8 @@
 									role="tabpanel" aria-labelledby="home-tab">
 									<ul>
 										<li v-for="item in medicaments" :key="item.code">
-											<a :href=``+`${base_url}`+`detail-medoc/`+`${item.code}`+`` class="rightopen shortlist shortlist-add">
+											<a :href=``+`${base_url}`+`detail-medoc/`+`${item.code}`+``
+												class="rightopen shortlist shortlist-add">
 												<div class="add-info">
 													<h6 class="shortlist-name">${item.nom}</h6>
 													<p>${item.ppv} FCFA</p>
@@ -258,14 +259,7 @@
 {% endblock content %}
 
 {% block pagejs %}
-<script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/validators.min.js"></script>
-<script src="https://unpkg.com/vue@2"></script>
-<script src='https://unpkg.com/axios/dist/axios.min.js'></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-
+{% include 'base/includes/cdn.html' %}
 <script>
 	Vue.use(window.vuelidate.default)
 	const { required, minLength, email, sameAs, maxStartDate } = window.validators;
@@ -417,7 +411,7 @@
 				}
 			},
 			reset_data: function () {
-				    this.add_medoc.code = "",
+				this.add_medoc.code = "",
 					this.add_medocnom = "",
 					this.add_medoc.dci1 = "",
 					this.add_medoc.dosage1 = "",

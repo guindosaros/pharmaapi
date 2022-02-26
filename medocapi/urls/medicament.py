@@ -13,5 +13,6 @@ BASE_PATH = "api/v1"
 urlpatterns = [
     path("", views.page_principale, name="index"),
     path("detail-medoc/<str:code>", views.detail_page, name="detail"),
+    path("category", views.category_page, name="category"),
     path(f"{BASE_PATH}/", include(router.urls)),
 ]

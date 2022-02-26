@@ -12,39 +12,49 @@
 	<meta property="og:description" content="Wedding Manager" />
 	<meta property="og:image" content="" />
 	<meta name="format-detection" content="telephone=no">
+	
 	<!-- FAVICONS ICON -->
 	<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
 	<link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.png' %}" />
+	
 	<!-- PAGE TITLE HERE -->
-	<title>Online Pharmacie</title>
+	<title>Shop Manager</title>
+	
 	<!-- MOBILE SPECIFIC -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
     {% block pagecss %}
     
     {% endblock pagecss %}
+	
+	<!-- STYLESHEETS -->
 	<link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/templete.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/business.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/responsive.min.css' %}">
-	<link class="skin" rel="stylesheet" type="text/css" href="{% static 'css/skin/skin-1.css' %}">	
-	<link rel="stylesheet" type="text/css" href="{% static 'css/star-rating-svg.css' %}">
+	<link class="skin" rel="stylesheet" type="text/css" href="{% static 'css/skin/skin-1.css' %}">		
+	
 </head>
 <body id="bg">
 <div id="loading-area"></div>
 <div class="page-wraper">
-    {% block content %}
-    
-    {% endblock content %}
+	<div class="bns-frame">
+		<div class="bns-frame-top">
+			
+		</div>
+        {% block content %}
+            
+        {% endblock content %}
+		<!-- Contact area END -->
+    </div>
 </div>
 <!-- JAVASCRIPT FILES ========================================= -->
 <script src="{% static 'js/jquery.min.js' %}"></script><!-- JQUERY.MIN JS -->
-<script src="{% static 'js/jquery-ui.js' %}"></script>
-<script src="{% static 'plugins/bootstrap/js/popper.min.js' %}"></script>
 <script src="{% static 'plugins/bootstrap/js/bootstrap.min.js' %}"></script><!-- BOOTSTRAP.MIN JS -->
 <script src="{% static 'plugins/bootstrap-touchspin/jquery.bootstrap-touchspin.js' %}"></script><!-- FORM JS -->
+<script src="{% static 'plugins/imagesloaded/imagesloaded.js' %}"></script><!-- IMAGESLOADED -->
 <script src="{% static 'js/custom.min.js' %}"></script><!-- CUSTOM FUCTIONS  -->
-<script src="{% static 'plugins/scroll/scrollbar.min.js' %}"></script><!-- SCROLLBAR JS -->
 {% block pagejs %}
 
 {% endblock pagejs %}
