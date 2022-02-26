@@ -8,6 +8,9 @@ install:
   - python manage.py makemigrations
   - python manage.py migrate
 before_script:
-  - sleep 10
+  - sleep 05
 script:
-  - python manage.py test
+  - coverage run --source='pharmaapi' manage.py test && coverage report && coverage html
+after_success:
+    - coveralls
+    

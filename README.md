@@ -1,6 +1,8 @@
 [![Build Status](https://app.travis-ci.com/guindosaros/pharmaapi.svg?branch=master)](https://app.travis-ci.com/guindosaros/pharmaapi)
 
+[![Coverage Status](https://coveralls.io/repos/github/guindosaros/pharmaapi/badge.svg?branch=master)](https://coveralls.io/github/guindosaros/pharmaapi?branch=master)
 ### structuture vuejs avec validation de donnees
+```
 <script>
     Vue.use(window.vuelidate.default)
     const { required, minLength, email, sameAs, maxStartDate } = window.validators;
@@ -36,3 +38,5 @@
         },
     })
 </script>
+
+```
