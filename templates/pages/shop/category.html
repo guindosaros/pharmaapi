@@ -88,7 +88,7 @@
                         </div>
                     </div>
                     <div class="row" v-if="get_category">
-                        <div class="lds-ring" >
+                        <div class="lds-ring">
                             <div></div>
                             <div></div>
                             <div></div>
@@ -96,13 +96,14 @@
                         </div>
                     </div>
                     <div class="row" v-if="!get_category">
-                        <div class="col-lg-6 col-md-4 col-sm-4">
+                        <div class="col-lg-6 col-md-4 col-sm-4" v-for="categorie in categories" :key="categorie.id">
                             <div class="add-video-bx">
                                 <div class="media">
-                                    <img src="{% static 'images/video/pic2.jpg'  %}" alt=""/>
+                                    <img :src="categorie.image" alt="" />
                                 </div>
-                                <h4 class="title">There are many variations of passages of Lorem Ipsum available, but the</h4>
-                                <a href="" class="close"><i class="la la-times"></i></a>
+                                <h4 class="title">${categorie.nom}</h4>
+                                <a type="button" v-on:click="show_delete_category(categorie.id)" class="close"><i
+                                        class="la la-times"></i></a>
                             </div>
                         </div>
                     </div>
@@ -123,17 +124,18 @@
         el: '#catepage',
         data: {
             base_url: window.location.protocol + "//" + window.location.host + "/",
-            on_send_category : false,
+            on_send_category: false,
             get_category: true,
-            
+            categories: {}
+
 
         },
         validations: {
-            
+
         },
         delimiters: ["${", "}"],
         mounted() {
-           
+            this.get_all_category()
 
         },
         methods: {
@@ -144,12 +146,22 @@
                 }
             },
 
-            
+            get_all_category: function () {
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.get("/api/v1/category/")
+                    .then(response => {
+                        console.log(response.status);
+                        this.categories = response.data.results
+                        this.get_category = false;
+                    })
+                    .catch((err) => { console.log(err); });
+            },
 
             show_delete_category: function (id) {
                 Swal.fire({
                     title: 'Confirmer suppression ?',
-                    text: "être vous sûre de supprimer ce Medicament !",
+                    text: "être vous sûre de supprimer cette categorie",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#2F86A6',
@@ -157,12 +169,33 @@
                     confirmButtonText: 'Oui'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        console.log(id)
+                        this.delette_medicament(id)
                     }
                 })
             },
 
-            
+            delette_medicament: function (id) {
+                this.on_delete_medoc = true;
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                axios.delete("/api/v1/category/" + id)
+                    .then(response => {
+                        if (response.status === 200) {
+                            this.get_all_category()
+                            toastr.success("Category supprimé avec succès!", "Suppression Ok!", { timeOut: 100000 })
+                        } else {
+                            toastr.error("Impossible de supprimer cet Medicaments", "Erreure de suppression!", { timeOut: 10000 })
+                            this.on_delete_medoc = false;
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        this.on_delete_medoc = false;
+                        toastr.error("Impossible de supprimer cet Medicaments", "Erreure de suppression!", { timeOut: 10000 })
+                    });
+            },
+
+
         },
     })
 </script>
