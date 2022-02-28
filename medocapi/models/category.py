@@ -12,6 +12,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categorys"
+        ordering = ("-date_add",)
 
     def __str__(self):
         return self.nom

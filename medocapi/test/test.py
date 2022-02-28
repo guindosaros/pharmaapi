@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy, reverse
 from rest_framework.test import APITestCase
-from medocapi.models import Medicaments
+from medocapi.models import Medicaments, Category
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 DATAS = [
@@ -52,6 +53,9 @@ DATAS = [
     },
 ]
 
+image1 = SimpleUploadedFile(name="sample.jpg", content=b"", content_type="image/jpeg")
+image2 = SimpleUploadedFile(name="sample2.jpg", content=b"", content_type="image/jpeg")
+
 
 class MedocApiTestCase(APITestCase):
     @classmethod
@@ -88,42 +92,17 @@ class MedocApiTestCase(APITestCase):
     def format_datetime(self, value):
         return value.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
-    def get_medicaments_list_data(self, medocs):
-        return [
-            {
-                "id": medoc.pk,
-                "code": medoc.code,
-                "nom": medoc.nom,
-                "ppv": medoc.ppv,
-                "status": medoc.status,
-                "date_add": self.format_datetime(medoc.date_add),
-                "date_upd": self.format_datetime(medoc.date_upd),
-            }
-            for medoc in medocs
-        ]
 
-    def get_medicaments_details_data(self, medocs):
-        return [
-            {
-                "id": medoc.pk,
-                "code": medoc.code,
-                "nom": medoc.nom,
-                "dci1": medoc.dci1,
-                "dosage1": medoc.dosage1,
-                "unite_dosage1": medoc.unite_dosage1,
-                "forme": medoc.forme,
-                "presentation": medoc.presentation,
-                "ppv": medoc.ppv,
-                "ph": medoc.ph,
-                "prix_br": medoc.prix_br,
-                "principe_genetique": medoc.principe_genetique,
-                "taux_remboursement": medoc.taux_remboursement,
-                "status": medoc.status,
-                "date_add": self.format_datetime(medoc.date_add),
-                "date_upd": self.format_datetime(medoc.date_upd),
-            }
-            for medoc in medocs
-        ]
+class CategoryApiTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.category1: Category = Category.objects.create(
+            nom="Category1", image=image1, status=True
+        )
+
+        cls.category2: Category = Category.objects.create(
+            nom="Category2", image=image2, status=True
+        )
 
 
 class TestMedocsApi(MedocApiTestCase):
@@ -135,10 +114,6 @@ class TestMedocsApi(MedocApiTestCase):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        # self.assertEqual(
-        #     response.json()["results"],
-        #     self.get_medicaments_list_data([self.medoc1, self.medoc2]),
-        # )
 
     def test_list_filter(self):
         """
@@ -146,9 +121,6 @@ class TestMedocsApi(MedocApiTestCase):
         """
         response = self.client.get(self.url + "?code=%s" % self.medoc1.code)
         self.assertEqual(response.status_code, 200)
-        # self.assertEqual(
-        #     self.get_medicaments_list_data([self.medoc1]), response.json()["results"]
-        # )
 
     def test_introuvable_details_medicaments(self):
         """
@@ -165,7 +137,42 @@ class TestMedocsApi(MedocApiTestCase):
             reverse("medicaments-detail", kwargs={"code": self.medoc1.code})
         )
         self.assertEqual(response.status_code, 200)
-        # self.assertEqual(
-        #     response.json(),
-        #     self.get_medicaments_details_data([self.medoc1]),
-        # )
+
+    def test_create_medicaments(self):
+        Medoc_count = Medicaments.objects.count()
+        response = self.client.post(
+            self.url,
+            data={
+                "code": "Nouvelle catégorie",
+                "nom": "Test",
+                "dci1": "dci1",
+                "dosage1": "dosage1",
+                "unite_dosage1": "unite_dosage1",
+                "forme": "forme",
+                "presentation": "presentation",
+                "ppv": "ppv",
+                "ph": "ph",
+                "prix_br": "prix_br",
+                "principe_genetique": "principe_genetique",
+                "taux_remboursement": "taux_remboursement",
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Medicaments.objects.count(), Medoc_count + 1)
+
+    def test_delette_medicaments(self):
+        response = self.client.delete(
+            reverse("medicaments-detail", kwargs={"code": self.medoc1.code})
+        )
+        self.assertEqual(response.status_code, 204)
+
+
+class TestCategoryAPi(CategoryApiTestCase):
+    url = reverse_lazy("category-list")
+
+    def test_list_category(self):
+        """
+        Test de verification la liste de medicaments
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)

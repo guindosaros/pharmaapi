@@ -74,7 +74,12 @@
                     <div class="row m-b30">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Nom">
+                                <input type="text" v-model.trim="$v.nom.$model" :class="status($v.nom)"
+                                    class="form-control" placeholder="Nom">
+                            </div>
+                            <div class="form-group">
+                                <input type="file" ref="file" v-on:change="handleFileUpload()"
+                                    accept=".png, .jpg, .jpeg" class="form-control" placeholder="Image">
                             </div>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12">
@@ -84,7 +89,11 @@
                                 <div></div>
                                 <div></div>
                             </div>
-                            <button class="btn blue gradient">Ajouter</button>
+                            <button class="btn blue gradient" type="button"
+                                V-if="!$v.validationCategoryGroup.$invalid  && !on_send_category"
+                                v-on:click="send_new_categorie">Ajouter</button>
+                            <button type="button" V-if="$v.validationCategoryGroup.$invalid" class="btn blue gradient"
+                                disabled>Ajouter</button>
                         </div>
                     </div>
                     <div class="row" v-if="get_category">
@@ -126,12 +135,18 @@
             base_url: window.location.protocol + "//" + window.location.host + "/",
             on_send_category: false,
             get_category: true,
-            categories: {}
+            categories: {},
+            nom: '',
+            file: null,
 
 
         },
         validations: {
-
+            nom: {
+                minLength: minLength(3),
+                required,
+            },
+            validationCategoryGroup: ['nom']
         },
         delimiters: ["${", "}"],
         mounted() {
@@ -144,6 +159,48 @@
                     error: validation.$error,
                     dirty: validation.$dirty
                 }
+            },
+
+            handleFileUpload() {
+                this.file = this.$refs.file.files[0];
+            },
+
+
+            send_new_categorie: function () {
+                this.on_send_category = true;
+                if (this.file === null) {
+                    this.on_send_category = false;
+                    Swal.fire({
+                        icon: 'warning',
+                        html: '<h4>Veillez selectionner une photo</h4>',
+                    });
+                } else {
+                    let formData = new FormData();
+                    formData.append('image', this.file)
+                    formData.append('nom', this.nom)
+                    formData.append('status', true)
+                    axios.defaults.xsrfCookieName = 'csrftoken';
+                    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                    axios.post("/api/v1/category/", formData)
+                        .then(response => {
+                            if (response.status === 201) {
+                                this.on_send_category = false;
+                                toastr.success("Category Ajouter avec succès!", { timeOut: 100000 })
+                                this.file = null;
+                                this.nom = '';
+                                this.get_all_category()
+                            } else {
+                                toastr.error("Impossible d'ajouter cette category", "Erreure d'Ajout!", { timeOut: 10000 })
+                                this.on_send_category = false;
+                            }
+                        })
+                        .catch((err) => {
+                            this.on_send_category = false;
+                            console.log(err);
+                        });
+
+                }
+
             },
 
             get_all_category: function () {
@@ -180,9 +237,9 @@
                 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
                 axios.delete("/api/v1/category/" + id)
                     .then(response => {
-                        if (response.status === 200) {
+                        if (response.status === 204) {
                             this.get_all_category()
-                            toastr.success("Category supprimé avec succès!", "Suppression Ok!", { timeOut: 100000 })
+                            toastr.success("Category supprimé avec succès!", { timeOut: 100000 })
                         } else {
                             toastr.error("Impossible de supprimer cet Medicaments", "Erreure de suppression!", { timeOut: 10000 })
                             this.on_delete_medoc = false;
